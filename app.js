@@ -3,7 +3,7 @@
    Dependencies: none (vanilla JS, fetch API)
    External APIs used:
      postcodes.io   → postcode → lat/lon   (free, no key)
-     TransportAPI   → nearby bus stops     (free tier key)
+     Overpass API   → nearby bus stops     (free, no key, 4 fallback servers)
      TransportAPI   → live departures      (free tier key)
 ══════════════════════════════════════════════════════ */
 
@@ -164,29 +164,63 @@ async function fetchStops(lat, lon, label) {
 }
 
 
-/* ── TRANSPORTAPI: find nearby stops ── */
-async function nearbyStops(lat, lon) {
-  const url =
-    `https://transportapi.com/v3/uk/bus/stops/near.json` +
-    `?app_id=${APP_ID}&app_key=${APP_KEY}` +
-    `&lat=${lat}&lon=${lon}&rpp=5`;
+/* ── OVERPASS API: find nearby stops (4 servers, auto-fallback) ── */
+const OVERPASS_SERVERS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.openstreetmap.ru/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+];
 
-  const r = await fetch(url);
+async function nearbyStops(lat, lon, radius = 800) {
+  const query =
+    `[out:json][timeout:15];` +
+    `node[highway=bus_stop](around:${radius},${lat},${lon});` +
+    `out body;`;
 
-  if (r.status === 401 || r.status === 403)
-    throw new Error('TRANSPORTAPI AUTH FAILED — CHECK API KEYS IN app.js');
+  let lastErr;
+  for (const server of OVERPASS_SERVERS) {
+    try {
+      const r = await fetch(server, {
+        method: 'POST',
+        body: query,
+        headers: { 'Content-Type': 'text/plain' },
+        signal: AbortSignal.timeout(10000),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const d = await r.json();
 
-  if (!r.ok) throw new Error('COULD NOT FETCH NEARBY STOPS');
+      const stops = (d.elements || [])
+        .map(n => {
+          const atco = n.tags?.['naptan:AtcoCode'] || n.tags?.['ref'];
+          if (!atco || !/^\d{4}[A-Z]{2,3}\d+/.test(atco)) return null;
+          return {
+            atco,
+            name: n.tags?.name || n.tags?.['naptan:CommonName'] || 'BUS STOP',
+            lat:  n.lat,
+            lon:  n.lon,
+            dist: haversine(lat, lon, n.lat, n.lon),
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.dist - b.dist);
 
-  const d = await r.json();
+      return stops;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw new Error('ALL OVERPASS SERVERS UNREACHABLE — CHECK YOUR CONNECTION');
+}
 
-  return (d.stops || []).map(s => ({
-    atco: s.atcocode,
-    name: s.name || s.stop_name || 'BUS STOP',
-    lat:  s.latitude,
-    lon:  s.longitude,
-    dist: s.distance
-  }));
+/* ── UTILITY: Haversine distance in metres ── */
+function haversine(la1, lo1, la2, lo2) {
+  const R = 6371000, r = Math.PI / 180;
+  const a =
+    Math.sin((la2 - la1) * r / 2) ** 2 +
+    Math.cos(la1 * r) * Math.cos(la2 * r) *
+    Math.sin((lo2 - lo1) * r / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 
@@ -200,6 +234,9 @@ async function getDeps(stop) {
 
   if (r.status === 401 || r.status === 403)
     throw new Error('TRANSPORTAPI AUTH FAILED — CHECK API KEYS IN app.js');
+
+  if (r.status === 429)
+    throw new Error('TRANSPORTAPI DAILY QUOTA REACHED (30/DAY FREE LIMIT)');
 
   if (!r.ok) return { stop, deps: [] };
 
