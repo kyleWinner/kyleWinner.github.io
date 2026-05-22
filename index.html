@@ -14,24 +14,34 @@
       --bee-yellow-dark: #E6BC00;
       --bee-black: #111111;
       --bee-dark: #1A1A1A;
-      --bee-grey: #2A2A2A;
-      --bee-mid: #444444;
-      --bee-light: #CCCCCC;
+      --bee-grey: #272727;
+      --bee-mid: #404040;
+      --bee-light: #BBBBBB;
       --bee-white: #F8F5E4;
-      --live-green: #00E676;
-      --sched-blue: #60A5FA;
-      --font-ui: 'Barlow', sans-serif;
-      --font-mono: 'Space Mono', monospace;
+      --live-green: #4ADE80;
+      --sched-blue: #93C5FD;
     }
 
     html, body {
       min-height: 100%;
       background: var(--bee-black);
       color: var(--bee-white);
-      font-family: var(--font-ui);
+      font-family: 'Barlow', sans-serif;
     }
 
-    /* ── HEADER ── */
+    /* BACKGROUND HEX PATTERN */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52'%3E%3Cpolygon points='30,1 59,16 59,46 30,61 1,46 1,16' fill='none' stroke='%23FFD100' stroke-width='0.5' opacity='0.07'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header, #setup-screen, #main-screen { position: relative; z-index: 1; }
+
+    /* HEADER */
     header {
       background: var(--bee-yellow);
       padding: 0 1.5rem;
@@ -44,137 +54,160 @@
       z-index: 100;
     }
 
-    .header-left {
+    .header-brand {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .bee-logo {
-      width: 36px;
-      height: 36px;
+    .bee-mark {
+      width: 34px;
+      height: 34px;
+      background: var(--bee-black);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-text {
+      line-height: 1.1;
     }
 
     .header-title {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 800;
       color: var(--bee-black);
       letter-spacing: -0.01em;
-      line-height: 1;
-    }
-    .header-title span {
-      display: block;
-      font-size: 0.65rem;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      opacity: 0.7;
     }
 
-    .refresh-btn {
+    .header-sub {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: rgba(0,0,0,0.55);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
       background: var(--bee-black);
       color: var(--bee-yellow);
       border: none;
       border-radius: 6px;
-      padding: 6px 14px;
-      font-family: var(--font-ui);
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
+      width: 34px;
+      height: 34px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      cursor: pointer;
       transition: opacity 0.15s;
+      flex-shrink: 0;
     }
-    .refresh-btn:hover { opacity: 0.85; }
-    .refresh-btn:disabled { opacity: 0.4; cursor: default; }
+    .icon-btn:hover { opacity: 0.8; }
+    .icon-btn:disabled { opacity: 0.35; cursor: default; }
+    .icon-btn svg { width: 16px; height: 16px; }
 
-    /* ── SETUP SCREEN ── */
+    /* SETUP */
     #setup-screen {
-      max-width: 520px;
-      margin: 4rem auto;
-      padding: 0 1.5rem;
+      max-width: 500px;
+      margin: 3rem auto;
+      padding: 0 1.25rem;
     }
 
-    .setup-card {
+    .card {
       background: var(--bee-dark);
       border: 1px solid var(--bee-grey);
-      border-radius: 12px;
-      padding: 2rem;
+      border-radius: 14px;
+      padding: 1.75rem;
     }
 
-    .setup-card h2 {
-      font-size: 1.4rem;
+    .card h2 {
+      font-size: 1.3rem;
       font-weight: 800;
       color: var(--bee-yellow);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
     }
 
-    .setup-card p {
-      font-size: 0.9rem;
+    .card .lead {
+      font-size: 0.88rem;
       color: var(--bee-light);
       line-height: 1.6;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
     }
 
     .step {
       display: flex;
       gap: 12px;
-      margin-bottom: 1rem;
       align-items: flex-start;
+      margin-bottom: 0.9rem;
     }
-    .step-num {
+
+    .step-n {
       background: var(--bee-yellow);
       color: var(--bee-black);
-      width: 24px;
-      height: 24px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 800;
       flex-shrink: 0;
-      margin-top: 2px;
+      margin-top: 1px;
     }
-    .step-text {
-      font-size: 0.88rem;
+
+    .step p {
+      font-size: 0.86rem;
       color: var(--bee-light);
       line-height: 1.5;
     }
-    .step-text a {
-      color: var(--bee-yellow);
-      text-decoration: none;
-    }
-    .step-text a:hover { text-decoration: underline; }
-    .step-text code {
+
+    .step a { color: var(--bee-yellow); text-decoration: none; }
+    .step a:hover { text-decoration: underline; }
+    .step code {
       background: var(--bee-grey);
-      padding: 1px 6px;
+      padding: 2px 6px;
       border-radius: 4px;
-      font-family: var(--font-mono);
-      font-size: 0.82rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
       color: #ddd;
     }
 
-    .key-input-row {
+    .input-row {
       display: flex;
       gap: 8px;
       margin-top: 1.5rem;
     }
-    .key-input {
+
+    .cred-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 1.5rem;
       flex: 1;
+    }
+
+    input.text-input {
+      width: 100%;
       background: var(--bee-grey);
       border: 1px solid var(--bee-mid);
       border-radius: 8px;
       padding: 10px 14px;
       color: var(--bee-white);
-      font-family: var(--font-mono);
-      font-size: 0.82rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
       outline: none;
       transition: border-color 0.15s;
     }
-    .key-input:focus { border-color: var(--bee-yellow); }
-    .key-input::placeholder { color: var(--bee-mid); }
+    input.text-input:focus { border-color: var(--bee-yellow); }
+    input.text-input::placeholder { color: var(--bee-mid); }
 
     .go-btn {
       background: var(--bee-yellow);
@@ -182,56 +215,68 @@
       border: none;
       border-radius: 8px;
       padding: 10px 20px;
-      font-family: var(--font-ui);
+      font-family: 'Barlow', sans-serif;
       font-size: 0.9rem;
       font-weight: 800;
       cursor: pointer;
+      align-self: flex-end;
+      white-space: nowrap;
       transition: background 0.15s;
+      height: 42px;
     }
     .go-btn:hover { background: var(--bee-yellow-dark); }
 
-    /* ── MAIN SCREEN ── */
-    #main-screen {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 1.5rem 1.25rem 3rem;
+    .hint {
+      margin-top: 0.6rem;
+      font-size: 0.75rem;
+      color: var(--bee-mid);
     }
 
-    /* ── STATUS BAR ── */
+    /* MAIN */
+    #main-screen {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 1.25rem 1.25rem 3rem;
+    }
+
+    /* STATUS */
     #status-bar {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 1.5rem;
-      font-size: 0.82rem;
+      gap: 8px;
+      margin-bottom: 1.25rem;
+      font-size: 0.8rem;
       color: var(--bee-light);
+      min-height: 20px;
     }
-    .status-dot {
-      width: 8px;
-      height: 8px;
+
+    .dot {
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: var(--bee-mid);
+      flex-shrink: 0;
     }
-    .status-dot.green { background: var(--live-green); box-shadow: 0 0 6px var(--live-green); }
-    .status-dot.yellow { background: var(--bee-yellow); }
-    .status-dot.red { background: #f87171; }
+    .dot.green { background: var(--live-green); }
+    .dot.yellow { background: var(--bee-yellow); }
+    .dot.red { background: #f87171; }
 
-    /* ── STOP CARD ── */
+    /* STOP CARD */
     .stop-card {
       background: var(--bee-dark);
       border: 1px solid var(--bee-grey);
       border-radius: 12px;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
       overflow: hidden;
     }
 
     .stop-header {
-      background: var(--bee-grey);
-      padding: 14px 18px;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
+      background: var(--bee-grey);
     }
 
     .stop-header-left {
@@ -241,9 +286,9 @@
       min-width: 0;
     }
 
-    .stop-icon {
-      width: 32px;
-      height: 32px;
+    .stop-icon-box {
+      width: 30px;
+      height: 30px;
       background: var(--bee-yellow);
       border-radius: 6px;
       display: flex;
@@ -251,347 +296,306 @@
       justify-content: center;
       flex-shrink: 0;
     }
-
-    .stop-icon svg { width: 18px; height: 18px; }
+    .stop-icon-box svg { width: 16px; height: 16px; }
 
     .stop-name {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 700;
-      color: var(--bee-white);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .stop-meta {
-      font-size: 0.75rem;
+    .stop-atco {
+      font-size: 0.7rem;
       color: var(--bee-light);
-      margin-top: 2px;
+      font-family: 'Space Mono', monospace;
+      margin-top: 1px;
     }
 
-    .stop-distance {
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      color: var(--bee-yellow);
+    .stop-dist {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
       font-weight: 700;
+      color: var(--bee-yellow);
       flex-shrink: 0;
     }
 
-    /* ── DEPARTURES TABLE ── */
-    .departures {
-      padding: 4px 0;
-    }
-
-    .departure-row {
+    /* DEPARTURES */
+    .dep-row {
       display: grid;
-      grid-template-columns: 56px 1fr auto auto;
+      grid-template-columns: 52px 1fr auto auto;
       align-items: center;
-      gap: 12px;
-      padding: 11px 18px;
+      gap: 10px;
+      padding: 10px 16px;
       border-bottom: 1px solid var(--bee-grey);
-      transition: background 0.1s;
     }
-    .departure-row:last-child { border-bottom: none; }
-    .departure-row:hover { background: rgba(255,255,255,0.03); }
+    .dep-row:last-child { border-bottom: none; }
+    .dep-row:hover { background: rgba(255,255,255,0.025); }
 
-    .route-badge {
+    .route {
       background: var(--bee-yellow);
       color: var(--bee-black);
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
       font-weight: 700;
-      padding: 4px 8px;
+      padding: 4px 6px;
       border-radius: 5px;
       text-align: center;
-      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .departure-dest {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--bee-white);
-      white-space: nowrap;
+    .dep-dest {
+      font-size: 0.88rem;
+      font-weight: 600;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .departure-op {
-      font-size: 0.72rem;
+    .dep-op {
+      font-size: 0.7rem;
       color: var(--bee-light);
       margin-top: 2px;
-      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .departure-time {
-      font-family: var(--font-mono);
-      font-size: 0.95rem;
+    .dep-time {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.9rem;
       font-weight: 700;
-      color: var(--bee-white);
       text-align: right;
       white-space: nowrap;
     }
 
-    .departure-status {
-      font-size: 0.7rem;
-      font-weight: 600;
+    .dep-badge {
+      font-size: 0.67rem;
+      font-weight: 700;
       text-align: right;
       white-space: nowrap;
     }
-    .status-live { color: var(--live-green); }
-    .status-sched { color: var(--sched-blue); }
-    .status-due { color: var(--bee-yellow); }
+    .badge-live { color: var(--live-green); }
+    .badge-sched { color: var(--sched-blue); }
+    .badge-due { color: var(--bee-yellow); }
 
-    /* ── EMPTY / ERROR STATES ── */
-    .state-msg {
-      padding: 24px 18px;
+    .no-deps {
+      padding: 20px 16px;
       text-align: center;
+      font-size: 0.85rem;
       color: var(--bee-light);
-      font-size: 0.88rem;
     }
 
-    /* ── SKELETON LOADER ── */
-    .skeleton {
-      background: linear-gradient(90deg, var(--bee-grey) 25%, var(--bee-mid) 50%, var(--bee-grey) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 4px;
-    }
+    /* SKELETONS */
     @keyframes shimmer {
-      0% { background-position: 200% 0; }
+      0%   { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
-
+    .skel {
+      background: linear-gradient(90deg, var(--bee-grey) 25%, var(--bee-mid) 50%, var(--bee-grey) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.6s infinite;
+      border-radius: 4px;
+    }
     .skel-row {
       display: flex;
-      gap: 12px;
       align-items: center;
-      padding: 12px 18px;
+      gap: 10px;
+      padding: 11px 16px;
       border-bottom: 1px solid var(--bee-grey);
     }
     .skel-row:last-child { border-bottom: none; }
 
-    /* ── UPDATED TIME ── */
-    .updated-time {
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--bee-mid);
-      margin-top: 1rem;
-    }
-
-    /* ── ERROR BANNER ── */
-    .error-banner {
-      background: rgba(248,113,113,0.12);
-      border: 1px solid rgba(248,113,113,0.3);
+    /* ERROR BANNER */
+    .err {
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.25);
       border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 0.85rem;
+      padding: 10px 14px;
+      font-size: 0.82rem;
       color: #fca5a5;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
       display: none;
     }
 
-    /* ── HEX PATTERN BACKGROUND ── */
-    .hex-bg {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-      opacity: 0.025;
+    .updated {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--bee-mid);
+      margin-top: 0.75rem;
     }
-    .hex-bg svg { width: 100%; height: 100%; }
 
-    #main-screen, #setup-screen { position: relative; z-index: 1; }
-    header { position: sticky; z-index: 100; }
-
-    @media (max-width: 480px) {
-      .departure-row { grid-template-columns: 48px 1fr auto; }
-      .departure-status { display: none; }
+    @media (max-width: 460px) {
+      .dep-row { grid-template-columns: 46px 1fr auto; }
+      .dep-badge { display: none; }
     }
   </style>
 </head>
 <body>
 
-<!-- Subtle hex background -->
-<div class="hex-bg" aria-hidden="true">
-  <svg xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <pattern id="hex" x="0" y="0" width="60" height="52" patternUnits="userSpaceOnUse">
-        <polygon points="30,2 58,17 58,47 30,62 2,47 2,17" fill="none" stroke="#FFD100" stroke-width="1"/>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#hex)"/>
-  </svg>
-</div>
-
-<!-- ── HEADER ── -->
 <header>
-  <div class="header-left">
-    <svg class="bee-logo" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <circle cx="18" cy="18" r="18" fill="#111111"/>
-      <!-- Bee body -->
-      <ellipse cx="18" cy="20" rx="7" ry="9" fill="#FFD100"/>
-      <rect x="11" y="17" width="14" height="3" rx="1.5" fill="#111"/>
-      <rect x="11" y="21" width="14" height="3" rx="1.5" fill="#111"/>
-      <!-- Wings -->
-      <ellipse cx="9" cy="14" rx="5" ry="3" fill="white" opacity="0.8" transform="rotate(-20 9 14)"/>
-      <ellipse cx="27" cy="14" rx="5" ry="3" fill="white" opacity="0.8" transform="rotate(20 27 14)"/>
-      <!-- Head -->
-      <circle cx="18" cy="11" r="4" fill="#FFD100"/>
-      <!-- Antennae -->
-      <line x1="16" y1="8" x2="13" y2="5" stroke="#111" stroke-width="1.2" stroke-linecap="round"/>
-      <line x1="20" y1="8" x2="23" y2="5" stroke="#111" stroke-width="1.2" stroke-linecap="round"/>
-      <circle cx="13" cy="5" r="1.2" fill="#111"/>
-      <circle cx="23" cy="5" r="1.2" fill="#111"/>
-    </svg>
-    <div class="header-title">
-      Bee Network
-      <span>Live Departures</span>
+  <div class="header-brand">
+    <div class="bee-mark" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="11" cy="13" rx="5" ry="6.5" fill="#FFD100"/>
+        <rect x="6" y="11" width="10" height="2" rx="1" fill="#111"/>
+        <rect x="6" y="14" width="10" height="2" rx="1" fill="#111"/>
+        <ellipse cx="6.5" cy="9" rx="3.5" ry="2" fill="white" opacity="0.75" transform="rotate(-20 6.5 9)"/>
+        <ellipse cx="15.5" cy="9" rx="3.5" ry="2" fill="white" opacity="0.75" transform="rotate(20 15.5 9)"/>
+        <circle cx="11" cy="7" r="3" fill="#FFD100"/>
+        <line x1="9.5" y1="5" x2="7.5" y2="3" stroke="#111" stroke-width="1" stroke-linecap="round"/>
+        <line x1="12.5" y1="5" x2="14.5" y2="3" stroke="#111" stroke-width="1" stroke-linecap="round"/>
+        <circle cx="7.5" cy="3" r="0.9" fill="#111"/>
+        <circle cx="14.5" cy="3" r="0.9" fill="#111"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <div class="header-title">Bee Network</div>
+      <div class="header-sub">Live Departures</div>
     </div>
   </div>
-  <button class="refresh-btn" id="refresh-btn" onclick="refreshData()" style="display:none">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-    Refresh
-  </button>
+  <div class="header-actions">
+    <button class="icon-btn" id="settings-btn" onclick="showSetup()" title="Settings" style="display:none" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+    <button class="icon-btn" id="refresh-btn" onclick="refresh()" title="Refresh" style="display:none" aria-label="Refresh">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </button>
+  </div>
 </header>
 
-<!-- ── SETUP SCREEN ── -->
+<!-- SETUP SCREEN -->
 <div id="setup-screen">
-  <div class="setup-card">
-    <h2>Get started</h2>
-    <p>This app uses the TfGM Open Data API to fetch live bus departures. You'll need a free API key to get going.</p>
+  <div style="max-width:500px; margin:2.5rem auto; padding:0 1.25rem">
+    <div class="card">
+      <h2>Get started</h2>
+      <p class="lead">This app uses TransportAPI — a free UK transport data service — to fetch live bus departures near you. You'll need a free account.</p>
 
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-text">
-        Go to <a href="https://developer.tfgm.com" target="_blank" rel="noopener">developer.tfgm.com</a> and create a free account.
+      <div class="step">
+        <div class="step-n">1</div>
+        <p>Visit <a href="https://developer.transportapi.com" target="_blank" rel="noopener">developer.transportapi.com</a> and register for a free account (30 queries/day — enough for personal use).</p>
       </div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-text">
-        Subscribe to the <strong style="color:#ddd">Bus Stop Schedules</strong> product under the Products menu.
+      <div class="step">
+        <div class="step-n">2</div>
+        <p>Once registered, create an app. You'll be given an <code>App ID</code> and an <code>App Key</code>.</p>
       </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-text">
-        Copy your <code>Primary Key</code> from your profile, then paste it below and click <strong style="color:#ddd">Go</strong>.
+      <div class="step">
+        <div class="step-n">3</div>
+        <p>Paste both below and press <strong style="color:#ddd">Go</strong>. Your credentials are stored only in your browser.</p>
       </div>
-    </div>
 
-    <div class="key-input-row">
-      <input
-        class="key-input"
-        id="api-key-input"
-        type="text"
-        placeholder="Paste your TfGM API key here"
-        autocomplete="off"
-        autocorrect="off"
-        spellcheck="false"
-      />
-      <button class="go-btn" onclick="startApp()">Go →</button>
+      <div class="cred-group">
+        <input class="text-input" id="app-id-input" type="text" placeholder="App ID  (e.g. a1b2c3d4)" autocomplete="off" spellcheck="false" />
+        <input class="text-input" id="app-key-input" type="text" placeholder="App Key  (e.g. z9307fd87b0000c107e098d5effedc97)" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="input-row" style="margin-top:1rem">
+        <button class="go-btn" onclick="startApp()" style="width:100%">Find my nearest stops →</button>
+      </div>
+      <p class="hint">Your credentials are saved to localStorage and never leave your device.</p>
     </div>
-    <p style="margin-top:0.75rem; font-size:0.78rem; color: var(--bee-mid);">
-      Your key is saved in your browser's local storage — it never leaves your device.
-    </p>
   </div>
 </div>
 
-<!-- ── MAIN SCREEN ── -->
+<!-- MAIN SCREEN -->
 <div id="main-screen" style="display:none">
-  <div id="error-banner" class="error-banner"></div>
+  <div class="err" id="err-banner"></div>
   <div id="status-bar">
-    <div class="status-dot" id="status-dot"></div>
-    <span id="status-text">Finding your location…</span>
+    <div class="dot" id="status-dot"></div>
+    <span id="status-text">Starting…</span>
   </div>
   <div id="stops-container"></div>
-  <div class="updated-time" id="updated-time"></div>
+  <div class="updated" id="updated-ts"></div>
 </div>
 
 <script>
-  const STORAGE_KEY = 'bee_tfgm_api_key';
-  let apiKey = '';
-  let refreshTimer = null;
+  const KEY_ID  = 'bee_app_id';
+  const KEY_KEY = 'bee_app_key';
+  let appId = '', appKey = '', timer = null;
 
-  /* ── INIT ── */
+  /* ── BOOT ── */
   window.addEventListener('DOMContentLoaded', () => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      apiKey = stored;
-      showMain();
-    }
+    appId  = localStorage.getItem(KEY_ID)  || '';
+    appKey = localStorage.getItem(KEY_KEY) || '';
+    if (appId && appKey) showMain(); 
   });
 
   function startApp() {
-    const val = document.getElementById('api-key-input').value.trim();
-    if (!val) return;
-    apiKey = val;
-    localStorage.setItem(STORAGE_KEY, apiKey);
+    const id  = document.getElementById('app-id-input').value.trim();
+    const key = document.getElementById('app-key-input').value.trim();
+    if (!id || !key) { alert('Please enter both App ID and App Key.'); return; }
+    appId = id; appKey = key;
+    localStorage.setItem(KEY_ID, id);
+    localStorage.setItem(KEY_KEY, key);
     showMain();
+  }
+
+  function showSetup() {
+    document.getElementById('main-screen').style.display = 'none';
+    document.getElementById('setup-screen').style.display = 'block';
+    document.getElementById('settings-btn').style.display = 'none';
+    document.getElementById('refresh-btn').style.display = 'none';
+    clearInterval(timer);
   }
 
   function showMain() {
     document.getElementById('setup-screen').style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
+    document.getElementById('settings-btn').style.display = 'flex';
     document.getElementById('refresh-btn').style.display = 'flex';
-    refreshData();
-    clearInterval(refreshTimer);
-    refreshTimer = setInterval(refreshData, 60000);
+    refresh();
+    clearInterval(timer);
+    timer = setInterval(refresh, 60000);
   }
 
   /* ── STATUS ── */
-  function setStatus(type, text) {
-    const dot = document.getElementById('status-dot');
-    const txt = document.getElementById('status-text');
-    dot.className = 'status-dot ' + (type || '');
-    txt.textContent = text;
+  function status(type, msg) {
+    document.getElementById('status-dot').className = 'dot ' + (type || '');
+    document.getElementById('status-text').textContent = msg;
   }
 
-  function showError(msg) {
-    const el = document.getElementById('error-banner');
+  function showErr(msg, keep) {
+    const el = document.getElementById('err-banner');
     el.textContent = msg;
     el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 8000);
+    if (!keep) setTimeout(() => el.style.display = 'none', 9000);
   }
 
   /* ── MAIN FLOW ── */
-  async function refreshData() {
+  async function refresh() {
     const btn = document.getElementById('refresh-btn');
     btn.disabled = true;
-    setStatus('yellow', 'Finding your location…');
-    showSkeletons();
+    document.getElementById('err-banner').style.display = 'none';
+    status('yellow', 'Getting your location…');
+    renderSkeletons();
 
     try {
       const pos = await getLocation();
       const { latitude: lat, longitude: lon } = pos.coords;
-      setStatus('yellow', 'Finding nearest bus stops…');
 
-      const stops = await findNearbyStops(lat, lon);
+      status('yellow', 'Finding nearest stops…');
+      const stops = await nearbyStops(lat, lon);
+
       if (!stops.length) {
-        setStatus('red', 'No bus stops found nearby.');
+        status('red', 'No bus stops found within 800 m.');
         document.getElementById('stops-container').innerHTML =
-          '<div class="state-msg">No bus stops found within 600 m. Try moving to a busier area.</div>';
-        btn.disabled = false;
+          '<div class="no-deps" style="padding:2rem">No bus stops found nearby. Try moving closer to a road.</div>';
         return;
       }
 
-      setStatus('yellow', `Found ${stops.length} stops — fetching departures…`);
+      status('yellow', 'Fetching departures…');
       const top2 = stops.slice(0, 2);
-
-      const results = await Promise.all(top2.map(s => getDepartures(s)));
-      renderStops(results);
-      setStatus('green', 'Live');
-      document.getElementById('updated-time').textContent =
-        'Last updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    } catch (err) {
-      console.error(err);
-      setStatus('red', 'Error — ' + (err.message || 'Something went wrong'));
-      showError(err.message || 'Could not load departures. Check your API key and try again.');
+      const results = await Promise.all(top2.map(s => getDeps(s)));
+      renderAll(results);
+      status('green', 'Live');
+      document.getElementById('updated-ts').textContent =
+        'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    } catch (e) {
+      console.error(e);
+      status('red', e.message || 'Error loading data.');
+      showErr(e.message || 'Something went wrong. Check your credentials and try again.', true);
     } finally {
       btn.disabled = false;
     }
@@ -599,46 +603,32 @@
 
   /* ── GEOLOCATION ── */
   function getLocation() {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error('Geolocation is not supported by your browser.'));
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(resolve, err => {
-        reject(new Error('Location access denied. Please allow location access and try again.'));
-      }, { enableHighAccuracy: true, timeout: 10000 });
+    return new Promise((res, rej) => {
+      if (!navigator.geolocation) return rej(new Error('Geolocation not supported by your browser.'));
+      navigator.geolocation.getCurrentPosition(res,
+        () => rej(new Error('Location denied. Please allow location access and try again.')),
+        { enableHighAccuracy: true, timeout: 12000 });
     });
   }
 
-  /* ── FIND NEARBY STOPS (Overpass API) ── */
-  async function findNearbyStops(lat, lon, radius = 600) {
-    const query = `
-      [out:json][timeout:15];
-      node[highway=bus_stop](around:${radius},${lat},${lon});
-      out body;
-    `.trim();
-
-    const url = 'https://overpass-api.de/api/interpreter';
-    const res = await fetch(url, {
+  /* ── NEARBY STOPS via Overpass API ── */
+  async function nearbyStops(lat, lon, radius = 800) {
+    const q = `[out:json][timeout:15];node[highway=bus_stop](around:${radius},${lat},${lon});out body;`;
+    const r = await fetch('https://overpass-api.de/api/interpreter', {
       method: 'POST',
-      body: query,
+      body: q,
       headers: { 'Content-Type': 'text/plain' }
     });
-    if (!res.ok) throw new Error('Could not reach Overpass API to find nearby stops.');
-
-    const data = await res.json();
-    const nodes = data.elements || [];
-
-    return nodes
+    if (!r.ok) throw new Error('Could not reach Overpass API to find nearby stops.');
+    const d = await r.json();
+    return (d.elements || [])
       .map(n => {
         const atco = n.tags?.['naptan:AtcoCode'] || n.tags?.['ref'];
-        const name = n.tags?.name || n.tags?.['naptan:CommonName'] || 'Bus Stop';
-        if (!atco) return null;
+        if (!atco || !/^\d{4}[A-Z]{2,3}\d+/.test(atco)) return null;
         return {
           atco,
-          name,
-          lat: n.lat,
-          lon: n.lon,
+          name: n.tags?.name || n.tags?.['naptan:CommonName'] || 'Bus Stop',
+          lat: n.lat, lon: n.lon,
           dist: haversine(lat, lon, n.lat, n.lon)
         };
       })
@@ -646,62 +636,65 @@
       .sort((a, b) => a.dist - b.dist);
   }
 
-  /* ── HAVERSINE ── */
-  function haversine(lat1, lon1, lat2, lon2) {
-    const R = 6371000;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2)**2 +
-              Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
-              Math.sin(dLon/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  }
+  /* ── DEPARTURES via TransportAPI ── */
+  async function getDeps(stop) {
+    // TransportAPI live bus departures endpoint
+    const url = `https://transportapi.com/v3/uk/bus/stop/${encodeURIComponent(stop.atco)}/live.json` +
+      `?app_id=${encodeURIComponent(appId)}&app_key=${encodeURIComponent(appKey)}&group=no&nextbuses=no&limit=8`;
 
-  /* ── GET DEPARTURES (TfGM OData API) ── */
-  async function getDepartures(stop) {
-    const encoded = encodeURIComponent(stop.atco);
-    const url = `https://api.tfgm.com/odata/busstopschedules?atcoCode=${encoded}&$top=8&$orderby=DepartureTime`;
+    const r = await fetch(url);
 
-    const res = await fetch(url, {
-      headers: {
-        'Ocp-Apim-Subscription-Key': apiKey,
-        'Accept': 'application/json'
+    if (r.status === 401 || r.status === 403) {
+      localStorage.removeItem(KEY_ID);
+      localStorage.removeItem(KEY_KEY);
+      throw new Error('Invalid TransportAPI credentials. Please re-enter them in Settings.');
+    }
+
+    if (r.status === 404) {
+      // Stop not found in TransportAPI — return empty
+      return { stop, deps: [] };
+    }
+
+    if (!r.ok) {
+      return { stop, deps: [] };
+    }
+
+    const data = await r.json();
+    // TransportAPI groups departures by line name; flatten them
+    const deps = [];
+    const departures = data.departures;
+    if (departures) {
+      for (const lineName of Object.keys(departures)) {
+        for (const d of departures[lineName]) {
+          deps.push({ ...d, line_name: lineName });
+        }
       }
+    }
+    // Sort by best_departure_estimate or aimed_departure_time
+    deps.sort((a, b) => {
+      const ta = parseMinutes(a.best_departure_estimate || a.aimed_departure_time);
+      const tb = parseMinutes(b.best_departure_estimate || b.aimed_departure_time);
+      return ta - tb;
     });
-
-    if (res.status === 401 || res.status === 403) {
-      // Wipe bad key so user can re-enter
-      localStorage.removeItem(STORAGE_KEY);
-      throw new Error('Invalid API key. Please refresh the page and re-enter your TfGM key.');
-    }
-
-    if (!res.ok) {
-      return { stop, departures: [] };
-    }
-
-    const data = await res.json();
-    const items = data.value || data.d?.results || data.d || [];
-    return { stop, departures: items };
+    return { stop, deps: deps.slice(0, 8) };
   }
 
   /* ── RENDER ── */
-  function renderStops(results) {
-    const container = document.getElementById('stops-container');
-    container.innerHTML = '';
-
-    results.forEach(({ stop, departures }) => {
-      const dist = stop.dist < 1000
+  function renderAll(results) {
+    const c = document.getElementById('stops-container');
+    c.innerHTML = '';
+    results.forEach(({ stop, deps }) => {
+      const d = stop.dist < 1000
         ? Math.round(stop.dist) + ' m'
         : (stop.dist / 1000).toFixed(1) + ' km';
 
       const card = document.createElement('div');
       card.className = 'stop-card';
-
       card.innerHTML = `
         <div class="stop-header">
           <div class="stop-header-left">
-            <div class="stop-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <div class="stop-icon-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="1" y="3" width="15" height="13" rx="2"/>
                 <path d="M16 8h4l3 3v5h-7V8z"/>
                 <circle cx="5.5" cy="18.5" r="2.5"/>
@@ -709,137 +702,118 @@
               </svg>
             </div>
             <div>
-              <div class="stop-name">${escHtml(stop.name)}</div>
-              <div class="stop-meta">ATCO: ${escHtml(stop.atco)}</div>
+              <div class="stop-name">${esc(stop.name)}</div>
+              <div class="stop-atco">${esc(stop.atco)}</div>
             </div>
           </div>
-          <div class="stop-distance">${dist}</div>
+          <div class="stop-dist">${d}</div>
         </div>
-        <div class="departures">
-          ${renderDepartures(departures)}
-        </div>
+        <div>${renderDeps(deps)}</div>
       `;
-      container.appendChild(card);
+      c.appendChild(card);
     });
   }
 
-  function renderDepartures(deps) {
-    if (!deps || !deps.length) {
-      return '<div class="state-msg">No departures found for this stop right now.</div>';
-    }
+  function renderDeps(deps) {
+    if (!deps.length) return '<div class="no-deps">No departures found right now.</div>';
 
-    return deps.slice(0, 8).map(dep => {
-      const route = dep.ServiceNumber || dep.RouteNumber || dep.LineName || '?';
-      const dest  = dep.Destination || dep.DirectionDescription || dep.DestinationDisplay || '—';
-      const op    = dep.OperatorName || dep.Operator || '';
-      const isLive = dep.IsRealTime === true || dep.IsLive === true || dep.IsRealTime === 'true';
+    return deps.map(dep => {
+      const route = esc(dep.line_name || dep.line || '?');
+      const dest  = esc(dep.direction || dep.direction_name || dep.destination_name || '—');
+      const op    = esc(dep.operator_name || dep.operator || '');
+      const isLive = dep.source === 'Realtime';
 
-      let timeStr = '—';
-      let statusLabel = '';
-      let statusClass = '';
+      const aimed    = dep.aimed_departure_time;
+      const expected = dep.expected_departure_time || dep.best_departure_estimate;
+      const timeStr  = expected || aimed || '—';
 
-      const rawTime = dep.DepartureTime || dep.ExpectedDepartureTime || dep.AimedDepartureTime;
-      if (rawTime) {
-        const t = parseTime(rawTime);
-        if (t) {
-          const now = new Date();
-          const diffMin = Math.round((t - now) / 60000);
-          if (diffMin <= 0) {
-            timeStr = 'Due';
-            statusClass = 'status-due';
-          } else if (diffMin < 60) {
-            timeStr = diffMin + ' min';
-          } else {
-            timeStr = t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-          }
+      const diffMin = parseMinutes(timeStr);
+      let display = timeStr;
+      let badgeClass = 'badge-sched';
+      let badge = 'Sched';
 
-          if (diffMin <= 1) {
-            statusLabel = 'Due';
-            statusClass = 'status-due';
-          } else if (isLive) {
-            statusLabel = 'Live';
-            statusClass = 'status-live';
-          } else {
-            statusLabel = 'Sched';
-            statusClass = 'status-sched';
-          }
-        }
+      if (diffMin !== null) {
+        if (diffMin <= 0)       { display = 'Due';          badgeClass = 'badge-due';   badge = 'Due'; }
+        else if (diffMin < 60)  { display = diffMin + ' min'; }
+        else                    { display = timeStr; }
+
+        if (diffMin <= 1)       { badge = 'Due';   badgeClass = 'badge-due'; }
+        else if (isLive)        { badge = 'Live';  badgeClass = 'badge-live'; }
       }
 
       return `
-        <div class="departure-row">
-          <div class="route-badge">${escHtml(route)}</div>
+        <div class="dep-row">
+          <div class="route">${route}</div>
           <div>
-            <div class="departure-dest">${escHtml(dest)}</div>
-            ${op ? `<div class="departure-op">${escHtml(op)}</div>` : ''}
+            <div class="dep-dest">${dest}</div>
+            ${op ? `<div class="dep-op">${op}</div>` : ''}
           </div>
-          <div class="departure-time">${escHtml(timeStr)}</div>
-          <div class="departure-status ${statusClass}">${statusLabel}</div>
+          <div class="dep-time">${esc(display)}</div>
+          <div class="dep-badge ${badgeClass}">${badge}</div>
         </div>
       `;
     }).join('');
   }
 
   /* ── SKELETONS ── */
-  function showSkeletons() {
-    const container = document.getElementById('stops-container');
-    container.innerHTML = [1, 2].map(() => `
-      <div class="stop-card">
+  function renderSkeletons() {
+    const busIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`;
+    const rows = [1,2,3,4].map(() => `
+      <div class="skel-row">
+        <div class="skel" style="width:44px;height:26px;border-radius:5px;flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div class="skel" style="width:75%;height:13px;margin-bottom:5px"></div>
+          <div class="skel" style="width:45%;height:10px"></div>
+        </div>
+        <div class="skel" style="width:44px;height:13px;flex-shrink:0"></div>
+      </div>`).join('');
+
+    document.getElementById('stops-container').innerHTML = [0,1].map(() => `
+      <div class="stop-card" style="margin-bottom:1rem">
         <div class="stop-header">
           <div class="stop-header-left">
-            <div class="stop-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-            </div>
+            <div class="stop-icon-box" aria-hidden="true">${busIcon}</div>
             <div>
-              <div class="skeleton" style="width:160px;height:16px;margin-bottom:6px"></div>
-              <div class="skeleton" style="width:90px;height:11px"></div>
+              <div class="skel" style="width:150px;height:14px;margin-bottom:5px"></div>
+              <div class="skel" style="width:90px;height:10px"></div>
             </div>
           </div>
         </div>
-        <div class="departures">
-          ${[1,2,3,4].map(() => `
-            <div class="skel-row">
-              <div class="skeleton" style="width:44px;height:28px;border-radius:5px"></div>
-              <div style="flex:1"><div class="skeleton" style="width:80%;height:14px;margin-bottom:5px"></div><div class="skeleton" style="width:50%;height:10px"></div></div>
-              <div class="skeleton" style="width:48px;height:16px"></div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `).join('');
+        <div>${rows}</div>
+      </div>`).join('');
   }
 
   /* ── HELPERS ── */
-  function escHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  function parseTime(raw) {
-    if (!raw) return null;
-    // Handle OData /Date(ms)/ format
-    const odataMatch = raw.match(/\/Date\((\d+)/);
-    if (odataMatch) return new Date(parseInt(odataMatch[1]));
-    // Handle ISO or HH:MM
-    const d = new Date(raw);
-    if (!isNaN(d)) return d;
-    // Handle HH:MM:SS string
-    const parts = raw.split(':');
-    if (parts.length >= 2) {
-      const now = new Date();
-      now.setHours(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2] || 0), 0);
-      return now;
-    }
-    return null;
+  function haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371000, r = Math.PI / 180;
+    const dLat = (lat2 - lat1) * r, dLon = (lon2 - lon1) * r;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   }
 
-  /* ── ALLOW ENTER KEY ON INPUT ── */
+  // Parse HH:MM time string into minutes from now
+  function parseMinutes(str) {
+    if (!str || str === 'null') return null;
+    const m = str.match(/^(\d{1,2}):(\d{2})$/);
+    if (!m) return null;
+    const now = new Date();
+    const h = parseInt(m[1]), min = parseInt(m[2]);
+    let diffMin = (h * 60 + min) - (now.getHours() * 60 + now.getMinutes());
+    if (diffMin < -720) diffMin += 1440; // handle midnight wrap
+    return diffMin;
+  }
+
+  /* ── ENTER KEY on setup inputs ── */
   document.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById('api-key-input');
-    if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') startApp(); });
+    ['app-id-input','app-key-input'].forEach(id => {
+      document.getElementById(id)?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') startApp();
+      });
+    });
   });
 </script>
 </body>
