@@ -113,125 +113,6 @@
     .icon-btn:disabled { opacity: 0.35; cursor: default; }
     .icon-btn svg { width: 16px; height: 16px; }
 
-    /* SETUP */
-    #setup-screen {
-      max-width: 500px;
-      margin: 3rem auto;
-      padding: 0 1.25rem;
-    }
-
-    .card {
-      background: var(--bee-dark);
-      border: 1px solid var(--bee-grey);
-      border-radius: 14px;
-      padding: 1.75rem;
-    }
-
-    .card h2 {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--bee-yellow);
-      margin-bottom: 0.4rem;
-    }
-
-    .card .lead {
-      font-size: 0.88rem;
-      color: var(--bee-light);
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-
-    .step {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      margin-bottom: 0.9rem;
-    }
-
-    .step-n {
-      background: var(--bee-yellow);
-      color: var(--bee-black);
-      font-size: 0.72rem;
-      font-weight: 800;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    .step p {
-      font-size: 0.86rem;
-      color: var(--bee-light);
-      line-height: 1.5;
-    }
-
-    .step a { color: var(--bee-yellow); text-decoration: none; }
-    .step a:hover { text-decoration: underline; }
-    .step code {
-      background: var(--bee-grey);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.8rem;
-      color: #ddd;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 1.5rem;
-    }
-
-    .cred-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 1.5rem;
-      flex: 1;
-    }
-
-    input.text-input {
-      width: 100%;
-      background: var(--bee-grey);
-      border: 1px solid var(--bee-mid);
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: var(--bee-white);
-      font-family: 'Space Mono', monospace;
-      font-size: 0.8rem;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-    input.text-input:focus { border-color: var(--bee-yellow); }
-    input.text-input::placeholder { color: var(--bee-mid); }
-
-    .go-btn {
-      background: var(--bee-yellow);
-      color: var(--bee-black);
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-family: 'Barlow', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 800;
-      cursor: pointer;
-      align-self: flex-end;
-      white-space: nowrap;
-      transition: background 0.15s;
-      height: 42px;
-    }
-    .go-btn:hover { background: var(--bee-yellow-dark); }
-
-    .hint {
-      margin-top: 0.6rem;
-      font-size: 0.75rem;
-      color: var(--bee-mid);
-    }
-
     /* MAIN */
     #main-screen {
       max-width: 700px;
@@ -458,46 +339,11 @@
     </div>
   </div>
   <div class="header-actions">
-    <button class="icon-btn" id="settings-btn" onclick="showSetup()" title="Settings" style="display:none" aria-label="Settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    </button>
     <button class="icon-btn" id="refresh-btn" onclick="refresh()" title="Refresh" style="display:none" aria-label="Refresh">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
     </button>
   </div>
 </header>
-
-<!-- SETUP SCREEN -->
-<div id="setup-screen">
-  <div style="max-width:500px; margin:2.5rem auto; padding:0 1.25rem">
-    <div class="card">
-      <h2>Get started</h2>
-      <p class="lead">This app uses TransportAPI — a free UK transport data service — to fetch live bus departures near you. You'll need a free account.</p>
-
-      <div class="step">
-        <div class="step-n">1</div>
-        <p>Visit <a href="https://developer.transportapi.com" target="_blank" rel="noopener">developer.transportapi.com</a> and register for a free account (30 queries/day — enough for personal use).</p>
-      </div>
-      <div class="step">
-        <div class="step-n">2</div>
-        <p>Once registered, create an app. You'll be given an <code>App ID</code> and an <code>App Key</code>.</p>
-      </div>
-      <div class="step">
-        <div class="step-n">3</div>
-        <p>Paste both below and press <strong style="color:#ddd">Go</strong>. Your credentials are stored only in your browser.</p>
-      </div>
-
-      <div class="cred-group">
-        <input class="text-input" id="app-id-input" type="text" placeholder="App ID  (e.g. a1b2c3d4)" autocomplete="off" spellcheck="false" />
-        <input class="text-input" id="app-key-input" type="text" placeholder="App Key  (e.g. z9307fd87b0000c107e098d5effedc97)" autocomplete="off" spellcheck="false" />
-      </div>
-      <div class="input-row" style="margin-top:1rem">
-        <button class="go-btn" onclick="startApp()" style="width:100%">Find my nearest stops →</button>
-      </div>
-      <p class="hint">Your credentials are saved to localStorage and never leave your device.</p>
-    </div>
-  </div>
-</div>
 
 <!-- MAIN SCREEN -->
 <div id="main-screen" style="display:none">
@@ -511,44 +357,16 @@
 </div>
 
 <script>
-  const KEY_ID  = 'bee_app_id';
-  const KEY_KEY = 'bee_app_key';
-  let appId = '', appKey = '', timer = null;
+  const appId  = '2d9de197';
+  const appKey = '62a9bae30dd15ebaf5ea0da18150ca44';
+  let timer = null;
 
   /* ── BOOT ── */
   window.addEventListener('DOMContentLoaded', () => {
-    appId  = localStorage.getItem(KEY_ID)  || '';
-    appKey = localStorage.getItem(KEY_KEY) || '';
-    if (appId && appKey) showMain(); 
-  });
-
-  function startApp() {
-    const id  = document.getElementById('app-id-input').value.trim();
-    const key = document.getElementById('app-key-input').value.trim();
-    if (!id || !key) { alert('Please enter both App ID and App Key.'); return; }
-    appId = id; appKey = key;
-    localStorage.setItem(KEY_ID, id);
-    localStorage.setItem(KEY_KEY, key);
-    showMain();
-  }
-
-  function showSetup() {
-    document.getElementById('main-screen').style.display = 'none';
-    document.getElementById('setup-screen').style.display = 'block';
-    document.getElementById('settings-btn').style.display = 'none';
-    document.getElementById('refresh-btn').style.display = 'none';
-    clearInterval(timer);
-  }
-
-  function showMain() {
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-    document.getElementById('settings-btn').style.display = 'flex';
     document.getElementById('refresh-btn').style.display = 'flex';
     refresh();
-    clearInterval(timer);
     timer = setInterval(refresh, 60000);
-  }
+  });
 
   /* ── STATUS ── */
   function status(type, msg) {
@@ -645,9 +463,7 @@
     const r = await fetch(url);
 
     if (r.status === 401 || r.status === 403) {
-      localStorage.removeItem(KEY_ID);
-      localStorage.removeItem(KEY_KEY);
-      throw new Error('Invalid TransportAPI credentials. Please re-enter them in Settings.');
+      throw new Error('TransportAPI credentials rejected (401/403). Check the keys baked into the file.');
     }
 
     if (r.status === 404) {
@@ -807,14 +623,7 @@
     return diffMin;
   }
 
-  /* ── ENTER KEY on setup inputs ── */
-  document.addEventListener('DOMContentLoaded', () => {
-    ['app-id-input','app-key-input'].forEach(id => {
-      document.getElementById(id)?.addEventListener('keydown', e => {
-        if (e.key === 'Enter') startApp();
-      });
-    });
-  });
+
 </script>
 </body>
 </html>
