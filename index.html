@@ -2,626 +2,722 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BEE.NET // Live Bus Departures</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="theme-color" content="#FFD100"/>
+  <title>BEE.NET</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --y: #FFD100;       /* bee yellow */
-      --y2: #FFEA00;
-      --bg: #0C0C0C;
-      --panel: #141414;
-      --border: #333;
-      --green: #39FF14;   /* neon green – live */
-      --red: #FF2D55;
-      --blue: #00E5FF;
-      --white: #F0ECD8;
-      --dim: #666;
-      --scan: rgba(0,0,0,0.18);
+      --y:      #FFD100;
+      --y2:     #FFE84D;
+      --bg:     #0C0C0C;
+      --panel:  #131313;
+      --panel2: #1A1A1A;
+      --border: #2A2A2A;
+      --border2:#383838;
+      --green:  #39FF14;
+      --red:    #FF2D55;
+      --blue:   #00E5FF;
+      --white:  #F0ECD8;
+      --dim:    #555;
+      --dim2:   #888;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-    html { font-size: 16px; }
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
 
     body {
       background: var(--bg);
       color: var(--white);
       font-family: 'Share Tech Mono', monospace;
-      min-height: 100vh;
-      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      inset: 0;
     }
 
-    /* ── CRT SCANLINES ── */
+    /* CRT scanlines — subtle on mobile */
     body::after {
       content: '';
       position: fixed;
       inset: 0;
       background: repeating-linear-gradient(
         to bottom,
-        transparent 0px,
-        transparent 3px,
-        var(--scan) 3px,
-        var(--scan) 4px
+        transparent 0px, transparent 2px,
+        rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 3px
       );
       pointer-events: none;
       z-index: 9999;
     }
 
-    /* ── DITHERED BG PATTERN ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        radial-gradient(circle at 20% 20%, rgba(255,209,0,0.04) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(57,255,20,0.03) 0%, transparent 50%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect x='0' y='0' width='1' height='1' fill='%23FFD100' opacity='0.025'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23FFD100' opacity='0.025'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ── TITLEBAR ── */
-    #titlebar {
+    /* ══════════════════════════════════
+       TOP BAR
+    ══════════════════════════════════ */
+    #topbar {
+      flex-shrink: 0;
+      background: var(--y);
+      padding: env(safe-area-inset-top, 0) 0 0;
       position: relative;
-      z-index: 10;
-      background: var(--y);
-      padding: 0;
-      display: flex;
-      flex-direction: column;
+      z-index: 100;
     }
 
-    .marquee-strip {
-      background: var(--bg);
-      color: var(--y);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.55rem;
-      padding: 5px 0;
-      overflow: hidden;
-      white-space: nowrap;
-      border-bottom: 2px solid var(--y);
-    }
-
-    .marquee-inner {
-      display: inline-block;
-      animation: marquee 28s linear infinite;
-    }
-
-    @keyframes marquee {
-      0%   { transform: translateX(100vw); }
-      100% { transform: translateX(-100%); }
-    }
-
-    .titlebar-main {
-      background: var(--y);
+    .tb-inner {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 8px 16px 10px;
+      padding: 10px 14px;
+      gap: 10px;
     }
 
-    .title-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    /* pixel bee mark */
+    .bee-mark {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
     }
 
-    .pixel-bee {
-      width: 40px;
-      height: 40px;
-      image-rendering: pixelated;
+    .tb-titles {
+      flex: 1;
+      min-width: 0;
     }
 
-    .title-text {
+    .tb-title {
       font-family: 'Press Start 2P', monospace;
+      font-size: 0.75rem;
       color: var(--bg);
-      line-height: 1.5;
+      line-height: 1;
+      letter-spacing: -0.02em;
     }
 
-    .title-text .t1 { font-size: 1rem; letter-spacing: -0.02em; }
-    .title-text .t2 { font-size: 0.45rem; opacity: 0.65; margin-top: 3px; }
-
-    .title-right {
-      display: flex;
-      gap: 6px;
-      align-items: center;
+    .tb-sub {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.32rem;
+      color: rgba(0,0,0,0.5);
+      margin-top: 5px;
+      letter-spacing: 0.04em;
     }
 
-    /* Windows-98-style window buttons */
-    .win-btn {
-      width: 22px;
-      height: 22px;
-      background: #C0C0C0;
+    /* Refresh button in topbar */
+    .tb-refresh {
+      flex-shrink: 0;
+      width: 38px;
+      height: 38px;
+      background: var(--bg);
       border: none;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
+      color: var(--y);
+      font-size: 1.1rem;
+      box-shadow:
+        inset -1px -1px 0 #000,
+        inset 1px 1px 0 rgba(255,255,255,0.1);
+      transition: opacity 0.1s;
+      -webkit-user-select: none;
+    }
+    .tb-refresh:active { opacity: 0.6; }
+    .tb-refresh:disabled { opacity: 0.3; }
+
+    /* Marquee strip */
+    .marquee-strip {
+      background: var(--bg);
+      border-top: 1px solid rgba(0,0,0,0.3);
+      padding: 4px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .marquee-inner {
+      display: inline-block;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.38rem;
+      color: var(--y);
+      animation: marq 30s linear infinite;
+    }
+    @keyframes marq {
+      from { transform: translateX(100vw); }
+      to   { transform: translateX(-100%); }
+    }
+
+    /* ══════════════════════════════════
+       SEARCH BAR
+    ══════════════════════════════════ */
+    #search-bar {
+      flex-shrink: 0;
+      background: var(--panel);
+      border-bottom: 2px solid var(--y);
+      padding: 10px 14px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      position: relative;
+      z-index: 50;
+    }
+
+    .search-label {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.4rem;
+      color: var(--dim2);
+      white-space: nowrap;
+    }
+
+    #postcode-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      color: var(--white);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.65rem;
+      padding: 11px 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      outline: none;
+      -webkit-appearance: none;
+      border-radius: 0;
+      caret-color: var(--y);
+      transition: border-color 0.15s;
+    }
+    #postcode-input:focus {
+      border-color: var(--y);
+      box-shadow: 0 0 0 1px var(--y);
+    }
+    #postcode-input::placeholder {
+      color: var(--dim);
+      font-size: 0.55rem;
+    }
+
+    .search-go {
+      background: var(--y);
+      color: var(--bg);
+      border: none;
       font-family: 'Press Start 2P', monospace;
       font-size: 0.5rem;
-      color: #000;
-      box-shadow:
-        inset -1px -1px 0 #808080,
-        inset 1px 1px 0 #fff,
-        inset -2px -2px 0 #aaa,
-        inset 2px 2px 0 #dfdfdf;
-      transition: box-shadow 0.05s;
+      padding: 11px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 44px;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+      transition: transform 0.08s, box-shadow 0.08s;
+      -webkit-user-select: none;
     }
-    .win-btn:active {
-      box-shadow:
-        inset 1px 1px 0 #808080,
-        inset -1px -1px 0 #fff;
+    .search-go:active {
+      transform: translate(2px, 2px);
+      box-shadow: none;
     }
-    .win-btn.refresh { color: #000; }
 
-    /* ── STATUS TICKER ── */
-    #status-ticker {
-      position: relative;
-      z-index: 5;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      padding: 5px 16px;
+    .gps-btn {
+      background: var(--panel2);
+      border: 1px solid var(--border2);
+      color: var(--y);
+      padding: 0;
+      width: 44px;
+      min-height: 44px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-family: 'VT323', monospace;
-      font-size: 1.05rem;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background 0.1s;
+      -webkit-user-select: none;
     }
+    .gps-btn:active { background: var(--border); }
+    .gps-btn.active { background: rgba(255,209,0,0.12); border-color: var(--y); }
 
-    .status-led {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--dim);
+    /* ══════════════════════════════════
+       STATUS LINE
+    ══════════════════════════════════ */
+    #status-line {
       flex-shrink: 0;
-      transition: background 0.3s;
-    }
-    .status-led.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
-    .status-led.yellow { background: var(--y); box-shadow: 0 0 8px var(--y); }
-    .status-led.red { background: var(--red); box-shadow: 0 0 8px var(--red); }
-
-    #status-text { color: var(--green); letter-spacing: 0.04em; }
-
-    .status-time {
-      margin-left: auto;
-      font-size: 0.9rem;
-      color: var(--dim);
-      font-family: 'Share Tech Mono', monospace;
-    }
-
-    /* ── MAIN LAYOUT ── */
-    #app {
-      position: relative;
-      z-index: 1;
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 20px 16px 60px;
-    }
-
-    /* ── WINDOW PANEL ── */
-    .window {
-      background: var(--panel);
-      border: 1px solid var(--y);
-      margin-bottom: 20px;
-      box-shadow:
-        0 0 0 1px var(--bg),
-        0 0 20px rgba(255,209,0,0.08),
-        4px 4px 0 rgba(255,209,0,0.15);
-    }
-
-    .window-titlebar {
-      background: var(--y);
-      padding: 6px 10px;
       display: flex;
       align-items: center;
       gap: 8px;
-      user-select: none;
+      padding: 6px 14px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
     }
 
-    .win-title {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.5rem;
-      color: var(--bg);
-      flex: 1;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .win-dots {
-      display: flex;
-      gap: 4px;
-    }
-
-    .win-dot {
+    .led {
       width: 8px;
       height: 8px;
       border-radius: 50%;
+      background: var(--dim);
+      flex-shrink: 0;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .led.green  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .led.yellow { background: var(--y);     box-shadow: 0 0 8px var(--y); }
+    .led.red    { background: var(--red);   box-shadow: 0 0 8px var(--red); }
+
+    #status-msg {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: var(--green);
+      letter-spacing: 0.04em;
+      flex: 1;
     }
 
-    .win-dot.r { background: var(--red); }
-    .win-dot.y { background: var(--y2); }
-    .win-dot.g { background: var(--green); }
-
-    .win-dist-badge {
+    #clock {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 0.65rem;
+      font-size: 0.72rem;
+      color: var(--dim);
+    }
+
+    /* ══════════════════════════════════
+       SCROLL AREA
+    ══════════════════════════════════ */
+    #scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      padding: 12px 12px 80px;
+      background: var(--bg);
+    }
+
+    /* ══════════════════════════════════
+       ERROR BANNER
+    ══════════════════════════════════ */
+    .err-box {
+      display: none;
+      background: rgba(255,45,85,0.1);
+      border: 1px solid var(--red);
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: #ff9aae;
+    }
+    .err-box::before {
+      content: 'ERR ► ';
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.42rem;
+      color: var(--red);
+    }
+
+    /* ══════════════════════════════════
+       STOP WINDOW CARD
+    ══════════════════════════════════ */
+    .stop-win {
+      background: var(--panel);
+      border: 1px solid var(--y);
+      margin-bottom: 14px;
+      box-shadow:
+        3px 3px 0 rgba(255,209,0,0.18),
+        0 0 16px rgba(255,209,0,0.06);
+    }
+
+    /* Window chrome bar */
+    .win-chrome {
+      background: var(--y);
+      padding: 7px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .win-dots { display: flex; gap: 4px; }
+    .wd { width: 9px; height: 9px; border-radius: 50%; }
+    .wd.r { background: var(--red); }
+    .wd.y { background: var(--y2); }
+    .wd.g { background: var(--green); }
+
+    .win-stop-name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.45rem;
+      color: var(--bg);
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+
+    .win-dist {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
       background: var(--bg);
       color: var(--y);
       padding: 2px 7px;
       border: 1px solid var(--y);
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
-    .window-body {
-      padding: 0;
+    /* ATCO sub-row */
+    .win-atco {
+      background: rgba(0,229,255,0.04);
+      border-bottom: 1px solid var(--border);
+      padding: 5px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .atco-lbl {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.32rem;
+      color: var(--dim);
+    }
+    .atco-val {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--blue);
+      letter-spacing: 0.1em;
     }
 
-    /* ── ATCO ROW ── */
-    .atco-row {
+    /* ══════════════════════════════════
+       DEPARTURE ROWS
+    ══════════════════════════════════ */
+    .dep-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 6px 12px;
+      padding: 12px 12px;
       border-bottom: 1px solid var(--border);
-      background: rgba(255,209,0,0.03);
+      min-height: 56px;
     }
+    .dep-row:last-child { border-bottom: none; }
 
-    .atco-label {
-      font-size: 0.65rem;
-      color: var(--dim);
-      font-family: 'Press Start 2P', monospace;
-      white-space: nowrap;
-    }
-
-    .atco-code {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.8rem;
-      color: var(--blue);
-      letter-spacing: 0.08em;
-    }
-
-    /* ── DEPARTURE TABLE ── */
-    .dep-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .dep-table thead tr {
-      background: rgba(255,209,0,0.06);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .dep-table th {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.38rem;
-      color: var(--dim);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 7px 12px;
-      text-align: left;
-      white-space: nowrap;
-    }
-
-    .dep-table th.right { text-align: right; }
-
-    .dep-table tbody tr {
-      border-bottom: 1px solid #1e1e1e;
-      transition: background 0.1s;
-    }
-
-    .dep-table tbody tr:last-child { border-bottom: none; }
-
-    .dep-table tbody tr:hover { background: rgba(255,209,0,0.04); }
-
-    .dep-table td {
-      padding: 9px 12px;
-      vertical-align: middle;
-    }
-
-    /* Route badge */
-    .route-num {
-      display: inline-block;
+    .dep-badge {
       background: var(--y);
       color: var(--bg);
       font-family: 'Press Start 2P', monospace;
-      font-size: 0.6rem;
-      padding: 4px 7px;
-      min-width: 42px;
+      font-size: 0.55rem;
+      padding: 6px 6px;
+      min-width: 46px;
       text-align: center;
-      white-space: nowrap;
+      flex-shrink: 0;
       box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 60px;
+    }
+
+    .dep-info {
+      flex: 1;
+      min-width: 0;
     }
 
     .dep-dest {
       font-family: 'VT323', monospace;
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       color: var(--white);
-      line-height: 1.1;
+      line-height: 1.05;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .dep-op {
-      font-size: 0.7rem;
-      color: var(--dim);
+      font-size: 0.65rem;
+      color: var(--dim2);
       margin-top: 1px;
-      font-family: 'Share Tech Mono', monospace;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .dep-time-cell { text-align: right; }
+    .dep-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
 
     .dep-time {
       font-family: 'VT323', monospace;
-      font-size: 1.6rem;
-      font-weight: normal;
+      font-size: 1.7rem;
       color: var(--y);
       line-height: 1;
       white-space: nowrap;
     }
 
-    .dep-time.due { color: var(--green); animation: blink 1s step-end infinite; }
+    .dep-time.due {
+      color: var(--green);
+      animation: blink 0.9s step-end infinite;
+    }
+
+    .dep-status {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.33rem;
+      padding: 3px 5px;
+      white-space: nowrap;
+    }
+    .dep-status.live  { background: rgba(57,255,20,0.12); color: var(--green); border: 1px solid rgba(57,255,20,0.5); }
+    .dep-status.sched { background: rgba(0,229,255,0.07); color: var(--blue);  border: 1px solid rgba(0,229,255,0.3); }
+    .dep-status.due   { background: rgba(255,209,0,0.12); color: var(--y);     border: 1px solid var(--y); animation: blink 0.9s step-end infinite; }
 
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50%       { opacity: 0; }
     }
 
-    .dep-status-cell { text-align: right; width: 52px; }
+    /* ══════════════════════════════════
+       SKELETON
+    ══════════════════════════════════ */
+    @keyframes pulse { 0%,100%{opacity:.25} 50%{opacity:.55} }
+    .sk { background: var(--border2); animation: pulse 1.5s ease infinite; display: inline-block; }
 
-    .live-tag {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.36rem;
-      padding: 3px 5px;
-      white-space: nowrap;
+    .sk-dep-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 12px;
+      border-bottom: 1px solid var(--border);
+      min-height: 56px;
     }
 
-    .live-tag.live {
-      background: rgba(57,255,20,0.12);
-      color: var(--green);
-      border: 1px solid var(--green);
-      box-shadow: 0 0 6px rgba(57,255,20,0.3);
-    }
-
-    .live-tag.sched {
-      background: rgba(0,229,255,0.08);
-      color: var(--blue);
-      border: 1px solid rgba(0,229,255,0.35);
-    }
-
-    .live-tag.due {
-      background: rgba(255,209,0,0.12);
-      color: var(--y);
-      border: 1px solid var(--y);
-      animation: blink 1s step-end infinite;
-    }
-
-    /* ── SKELETON ── */
-    @keyframes shimmer {
-      0%   { opacity: 0.3; }
-      50%  { opacity: 0.7; }
-      100% { opacity: 0.3; }
-    }
-
-    .skel {
-      background: var(--border);
-      border-radius: 2px;
-      animation: shimmer 1.4s ease infinite;
-      display: inline-block;
-    }
-
-    /* ── EMPTY STATE ── */
+    /* ══════════════════════════════════
+       EMPTY / NO DEPS
+    ══════════════════════════════════ */
     .no-deps {
-      padding: 20px 12px;
+      padding: 22px 12px;
       text-align: center;
       font-family: 'VT323', monospace;
       font-size: 1.1rem;
-      color: var(--dim);
+      color: var(--dim2);
     }
 
-    /* ── ERROR WINDOW ── */
-    .err-window {
-      display: none;
-      background: rgba(255,45,85,0.1);
-      border: 1px solid var(--red);
-      padding: 10px 14px;
-      margin-bottom: 16px;
-      font-family: 'VT323', monospace;
-      font-size: 1rem;
-      color: #ff9aae;
-      box-shadow: 0 0 12px rgba(255,45,85,0.2);
-    }
-
-    .err-window::before {
-      content: '!! ERROR: ';
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.5rem;
-      color: var(--red);
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    /* ── BOTTOM STATUSBAR ── */
-    #statusbar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 10;
+    /* ══════════════════════════════════
+       BOTTOM NAV BAR
+    ══════════════════════════════════ */
+    #bottom-bar {
+      flex-shrink: 0;
       background: var(--y);
       border-top: 2px solid var(--bg);
-      padding: 3px 14px;
+      padding: 4px 14px calc(4px + env(safe-area-inset-bottom, 0));
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
       font-family: 'Press Start 2P', monospace;
-      font-size: 0.4rem;
+      font-size: 0.35rem;
       color: var(--bg);
+      gap: 6px;
     }
 
-    .sb-seg {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .sb-divider {
-      width: 1px;
-      height: 12px;
-      background: rgba(0,0,0,0.25);
-    }
-
-    .sb-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--bg);
-      opacity: 0.4;
-    }
-
-    .sb-dot.active { opacity: 1; animation: blink 1.5s step-end infinite; }
-
-    /* ── PIXEL BEE SVG ── */
-    /* inline SVG used in JS */
-
-    @media (max-width: 500px) {
-      .dep-table th.hide-sm,
-      .dep-table td.hide-sm { display: none; }
-      .title-text .t1 { font-size: 0.7rem; }
-    }
+    .bb-seg { display: flex; align-items: center; gap: 5px; }
+    .bb-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--bg); opacity: 0.35; }
+    .bb-dot.on { opacity: 1; animation: blink 1.5s step-end infinite; }
+    .bb-div { width: 1px; height: 10px; background: rgba(0,0,0,0.2); }
   </style>
 </head>
 <body>
 
-<!-- TITLEBAR -->
-<div id="titlebar">
+<!-- ══ TOP BAR ══ -->
+<div id="topbar">
+  <div class="tb-inner">
+    <!-- pixel bee -->
+    <svg class="bee-mark" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="5" y="7" width="6" height="7" fill="#111"/>
+      <rect x="5" y="7" width="6" height="7" fill="#FFD100" opacity="0.95"/>
+      <rect x="5" y="9" width="6" height="2" fill="#111"/>
+      <rect x="5" y="12" width="6" height="1" fill="#111"/>
+      <rect x="6" y="5" width="4" height="3" fill="#FFD100"/>
+      <rect x="6" y="3" width="1" height="2" fill="#111"/>
+      <rect x="9" y="3" width="1" height="2" fill="#111"/>
+      <rect x="5" y="2" width="2" height="1" fill="#111"/>
+      <rect x="9" y="2" width="2" height="1" fill="#111"/>
+      <rect x="1" y="6" width="4" height="3" fill="white" opacity="0.85"/>
+      <rect x="11" y="6" width="4" height="3" fill="white" opacity="0.85"/>
+      <rect x="6" y="6" width="1" height="1" fill="#111"/>
+      <rect x="9" y="6" width="1" height="1" fill="#111"/>
+    </svg>
+    <div class="tb-titles">
+      <div class="tb-title">BEE.NET</div>
+      <div class="tb-sub">LIVE DEPARTURES // GREATER MANCHESTER</div>
+    </div>
+    <button class="tb-refresh" id="refresh-btn" onclick="doRefresh()" aria-label="Refresh" title="Refresh">
+      ↻
+    </button>
+  </div>
   <div class="marquee-strip" aria-hidden="true">
-    <span class="marquee-inner">
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;★ BEE NETWORK LIVE DEPARTURES ★ POWERED BY TRANSPORTAPI ★ GREATER MANCHESTER ★ ALL TIMES LOCAL ★ PRESS REFRESH TO UPDATE ★ BEE NETWORK LIVE DEPARTURES ★ POWERED BY TRANSPORTAPI ★ GREATER MANCHESTER ★ ALL TIMES LOCAL ★
-    </span>
+    <span class="marquee-inner">★ BEE NETWORK ★ LIVE BUS DEPARTURES ★ GREATER MANCHESTER ★ ENTER POSTCODE OR USE GPS ★ AUTO-REFRESH EVERY 60s ★ BEE NETWORK ★ LIVE BUS DEPARTURES ★ GREATER MANCHESTER ★</span>
   </div>
-  <div class="titlebar-main">
-    <div class="title-left">
-      <!-- pixel bee -->
-      <svg class="pixel-bee" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <!-- body -->
-        <rect x="5" y="7" width="6" height="7" fill="#FFD100"/>
-        <rect x="5" y="9" width="6" height="2" fill="#111"/>
-        <rect x="5" y="12" width="6" height="1" fill="#111"/>
-        <!-- head -->
-        <rect x="6" y="5" width="4" height="3" fill="#FFD100"/>
-        <!-- antennae -->
-        <rect x="6" y="3" width="1" height="2" fill="#111"/>
-        <rect x="9" y="3" width="1" height="2" fill="#111"/>
-        <rect x="5" y="2" width="2" height="1" fill="#111"/>
-        <rect x="9" y="2" width="2" height="1" fill="#111"/>
-        <!-- wings -->
-        <rect x="1" y="6" width="4" height="3" fill="white" opacity="0.8"/>
-        <rect x="11" y="6" width="4" height="3" fill="white" opacity="0.8"/>
-        <!-- eyes -->
-        <rect x="6" y="6" width="1" height="1" fill="#111"/>
-        <rect x="9" y="6" width="1" height="1" fill="#111"/>
-      </svg>
-      <div class="title-text">
-        <div class="t1">BEE.NET</div>
-        <div class="t2">LIVE DEPARTURES // GREATER MANCHESTER</div>
-      </div>
+</div>
+
+<!-- ══ SEARCH BAR ══ -->
+<div id="search-bar">
+  <input
+    id="postcode-input"
+    type="text"
+    inputmode="text"
+    placeholder="M1 1AE"
+    maxlength="8"
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="characters"
+    spellcheck="false"
+    aria-label="Postcode"
+  />
+  <button class="search-go" onclick="searchPostcode()" aria-label="Search postcode">GO</button>
+  <button class="gps-btn" id="gps-btn" onclick="useGPS()" aria-label="Use my location" title="Use GPS">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" stroke-width="0"/><circle cx="12" cy="12" r="7" stroke-dasharray="3 3"/></svg>
+  </button>
+</div>
+
+<!-- ══ STATUS LINE ══ -->
+<div id="status-line">
+  <div class="led" id="led"></div>
+  <span id="status-msg">READY.</span>
+  <span id="clock"></span>
+</div>
+
+<!-- ══ SCROLL AREA ══ -->
+<div id="scroll-area">
+  <div class="err-box" id="err-box"></div>
+  <div id="stops-container">
+    <div style="text-align:center; padding:60px 20px; font-family:'VT323',monospace; font-size:1.1rem; color:var(--dim2); line-height:2;">
+      ENTER A POSTCODE ABOVE<br>OR TAP THE GPS BUTTON<br>TO FIND NEARBY BUSES
     </div>
-    <div class="title-right">
-      <button class="win-btn refresh" id="refresh-btn" onclick="refresh()" aria-label="Refresh" title="Refresh">↻</button>
-    </div>
   </div>
 </div>
 
-<!-- STATUS TICKER -->
-<div id="status-ticker">
-  <div class="status-led" id="status-led"></div>
-  <span id="status-text">INITIALISING...</span>
-  <span class="status-time" id="clock"></span>
-</div>
-
-<!-- MAIN APP -->
-<div id="app">
-  <div class="err-window" id="err-banner"></div>
-  <div id="stops-container"></div>
-</div>
-
-<!-- BOTTOM STATUSBAR -->
-<div id="statusbar" aria-hidden="true">
-  <div class="sb-seg">
-    <div class="sb-dot active" id="sb-dot"></div>
-    <span id="sb-status">LOADING</span>
+<!-- ══ BOTTOM BAR ══ -->
+<div id="bottom-bar" aria-hidden="true">
+  <div class="bb-seg">
+    <div class="bb-dot on" id="bb-dot"></div>
+    <span id="bb-status">READY</span>
   </div>
-  <div class="sb-divider"></div>
-  <div class="sb-seg">
-    <span>TRANSPORTAPI</span>
-  </div>
-  <div class="sb-divider"></div>
-  <div class="sb-seg">
-    <span>© BEE NETWORK // TFGM</span>
-  </div>
-  <div class="sb-divider" style="margin-left:auto"></div>
-  <div class="sb-seg">
-    <span id="sb-time">--:--:--</span>
-  </div>
+  <div class="bb-div"></div>
+  <div class="bb-seg"><span>TRANSPORTAPI</span></div>
+  <div class="bb-div"></div>
+  <div class="bb-seg"><span>© TFGM / BEE NETWORK</span></div>
+  <div class="bb-div" style="margin-left:auto"></div>
+  <div class="bb-seg"><span id="bb-clock">--:--</span></div>
 </div>
 
 <script>
   const APP_ID  = '2d9de197';
   const APP_KEY = '62a9bae30dd15ebaf5ea0da18150ca44';
-  let autoTimer = null;
+
+  let lastLat = null, lastLon = null, autoTimer = null;
 
   /* ── CLOCK ── */
-  function tickClock() {
-    const t = new Date().toLocaleTimeString('en-GB');
-    document.getElementById('sb-time').textContent = t;
+  function tick() {
+    const t = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     document.getElementById('clock').textContent = t;
+    document.getElementById('bb-clock').textContent = t;
   }
-  tickClock();
-  setInterval(tickClock, 1000);
+  tick();
+  setInterval(tick, 10000);
 
-  /* ── BOOT ── */
-  window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('refresh-btn').disabled = false;
-    doRefresh();
-    autoTimer = setInterval(doRefresh, 60000);
+  /* ── INPUT: ENTER KEY ── */
+  document.getElementById('postcode-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); searchPostcode(); }
   });
 
   /* ── STATUS ── */
   function setStatus(type, msg) {
-    const led = document.getElementById('status-led');
-    const txt = document.getElementById('status-text');
-    const sbs = document.getElementById('sb-status');
-    const dot = document.getElementById('sb-dot');
-    led.className = 'status-led ' + (type || '');
-    txt.textContent = msg;
-    sbs.textContent = msg.length > 20 ? msg.slice(0, 20) + '…' : msg;
-    dot.className = 'sb-dot' + (type === 'green' ? ' active' : '');
+    document.getElementById('led').className = 'led ' + (type || '');
+    document.getElementById('status-msg').textContent = msg;
+    const bb = msg.length > 18 ? msg.slice(0, 18) + '…' : msg;
+    document.getElementById('bb-status').textContent = bb;
+    document.getElementById('bb-dot').className = 'bb-dot' + (type === 'green' ? ' on' : '');
   }
 
   function showErr(msg) {
-    const el = document.getElementById('err-banner');
+    const el = document.getElementById('err-box');
     el.textContent = msg;
     el.style.display = 'block';
-    setTimeout(() => el.style.display = 'none', 9000);
+    document.getElementById('scroll-area').scrollTop = 0;
+    setTimeout(() => el.style.display = 'none', 8000);
   }
 
-  /* ── MAIN FLOW ── */
-  async function doRefresh() {
-    const btn = document.getElementById('refresh-btn');
-    btn.disabled = true;
-    document.getElementById('err-banner').style.display = 'none';
+  /* ── GPS ── */
+  function useGPS() {
+    const btn = document.getElementById('gps-btn');
+    btn.classList.add('active');
+    document.getElementById('postcode-input').value = '';
+    clearAuto();
     setStatus('yellow', 'LOCATING...');
     renderSkeletons();
+
+    if (!navigator.geolocation) {
+      setStatus('red', 'GPS NOT SUPPORTED');
+      btn.classList.remove('active');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        btn.classList.remove('active');
+        lastLat = pos.coords.latitude;
+        lastLon = pos.coords.longitude;
+        fetchStops(lastLat, lastLon, 'GPS LOCATION');
+        startAuto();
+      },
+      () => {
+        btn.classList.remove('active');
+        setStatus('red', 'LOCATION DENIED');
+        showErr('Location access denied. Allow location access in your browser settings.');
+      },
+      { enableHighAccuracy: true, timeout: 12000 }
+    );
+  }
+
+  /* ── POSTCODE SEARCH ── */
+  async function searchPostcode() {
+    const raw = document.getElementById('postcode-input').value.trim().toUpperCase().replace(/\s+/g, '');
+    if (!raw) { showErr('ENTER A POSTCODE FIRST'); return; }
+    clearAuto();
+    setStatus('yellow', 'LOOKING UP ' + raw + '...');
+    renderSkeletons();
+
     try {
-      const pos = await getLocation();
-      const { latitude: lat, longitude: lon } = pos.coords;
-      setStatus('yellow', 'SCANNING FOR STOPS...');
+      const r = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(raw)}`);
+      const d = await r.json();
+      if (!r.ok || d.status !== 200) throw new Error('POSTCODE NOT FOUND: ' + raw);
+      lastLat = d.result.latitude;
+      lastLon = d.result.longitude;
+      fetchStops(lastLat, lastLon, raw);
+      startAuto();
+    } catch (e) {
+      setStatus('red', 'POSTCODE ERROR');
+      showErr(e.message || 'Could not look up that postcode.');
+    }
+  }
+
+  /* ── AUTO REFRESH ── */
+  function startAuto() {
+    clearAuto();
+    autoTimer = setInterval(() => {
+      if (lastLat !== null) fetchStops(lastLat, lastLon);
+    }, 60000);
+  }
+  function clearAuto() { clearInterval(autoTimer); }
+
+  /* ── MANUAL REFRESH ── */
+  function doRefresh() {
+    if (lastLat === null) {
+      document.getElementById('postcode-input').focus();
+      return;
+    }
+    fetchStops(lastLat, lastLon);
+  }
+
+  /* ── MAIN FETCH FLOW ── */
+  async function fetchStops(lat, lon, label) {
+    const btn = document.getElementById('refresh-btn');
+    btn.disabled = true;
+    document.getElementById('err-box').style.display = 'none';
+    if (label) setStatus('yellow', 'SCANNING ' + label + '...');
+    else       setStatus('yellow', 'REFRESHING...');
+
+    try {
       const stops = await nearbyStops(lat, lon);
       if (!stops.length) {
         setStatus('red', 'NO STOPS FOUND');
         document.getElementById('stops-container').innerHTML =
-          '<div class="no-deps">NO BUS STOPS FOUND WITHIN 800M</div>';
+          '<div class="no-deps">NO BUS STOPS FOUND<br>WITHIN 800M</div>';
         return;
       }
       setStatus('yellow', 'FETCHING DEPARTURES...');
@@ -631,25 +727,13 @@
     } catch (e) {
       console.error(e);
       setStatus('red', 'ERROR');
-      showErr(e.message || 'Unexpected error. Check console.');
+      showErr(e.message || 'Unexpected error. Try again.');
     } finally {
       btn.disabled = false;
     }
   }
 
-  function refresh() { doRefresh(); }
-
-  /* ── GEOLOCATION ── */
-  function getLocation() {
-    return new Promise((res, rej) => {
-      if (!navigator.geolocation) return rej(new Error('GEOLOCATION NOT SUPPORTED'));
-      navigator.geolocation.getCurrentPosition(res,
-        () => rej(new Error('LOCATION DENIED — PLEASE ALLOW IN BROWSER')),
-        { enableHighAccuracy: true, timeout: 12000 });
-    });
-  }
-
-  /* ── OVERPASS: NEARBY STOPS ── */
+  /* ── OVERPASS ── */
   async function nearbyStops(lat, lon, radius = 800) {
     const q = `[out:json][timeout:15];node[highway=bus_stop](around:${radius},${lat},${lon});out body;`;
     const r = await fetch('https://overpass-api.de/api/interpreter', {
@@ -673,21 +757,20 @@
       .sort((a, b) => a.dist - b.dist);
   }
 
-  /* ── TRANSPORTAPI: DEPARTURES ── */
+  /* ── TRANSPORTAPI ── */
   async function getDeps(stop) {
-    const url = `https://transportapi.com/v3/uk/bus/stop/${encodeURIComponent(stop.atco)}/live.json` +
-      `?app_id=${APP_ID}&app_key=${APP_KEY}&group=no&nextbuses=no&limit=8`;
+    const url = `https://transportapi.com/v3/uk/bus/stop/${encodeURIComponent(stop.atco)}/live.json`
+      + `?app_id=${APP_ID}&app_key=${APP_KEY}&group=no&nextbuses=no&limit=8`;
     const r = await fetch(url);
-    if (r.status === 401 || r.status === 403) throw new Error('TRANSPORTAPI AUTH FAILED — CHECK API KEYS');
+    if (r.status === 401 || r.status === 403) throw new Error('TRANSPORTAPI AUTH FAILED');
     if (!r.ok) return { stop, deps: [] };
     const data = await r.json();
     const deps = [];
     if (data.departures) {
-      for (const line of Object.keys(data.departures)) {
+      for (const line of Object.keys(data.departures))
         for (const d of data.departures[line]) deps.push({ ...d, line_name: line });
-      }
     }
-    deps.sort((a, b) => diffMin(a) - diffMin(b));
+    deps.sort((a, b) => minsAway(a) - minsAway(b));
     return { stop, deps: deps.slice(0, 7) };
   }
 
@@ -699,112 +782,85 @@
       const dist = stop.dist < 1000
         ? Math.round(stop.dist) + 'M'
         : (stop.dist / 1000).toFixed(1) + 'KM';
-
       const win = document.createElement('div');
-      win.className = 'window';
+      win.className = 'stop-win';
       win.innerHTML = `
-        <div class="window-titlebar">
+        <div class="win-chrome">
           <div class="win-dots" aria-hidden="true">
-            <div class="win-dot r"></div>
-            <div class="win-dot y"></div>
-            <div class="win-dot g"></div>
+            <div class="wd r"></div><div class="wd y"></div><div class="wd g"></div>
           </div>
-          <div class="win-title">${esc(stop.name.toUpperCase())}</div>
-          <div class="win-dist-badge">${dist} AWAY</div>
+          <div class="win-stop-name">${esc(stop.name.toUpperCase())}</div>
+          <div class="win-dist">${dist}</div>
         </div>
-        <div class="window-body">
-          <div class="atco-row">
-            <span class="atco-label">ATCO:</span>
-            <span class="atco-code">${esc(stop.atco)}</span>
-          </div>
-          ${renderTable(deps)}
+        <div class="win-atco">
+          <span class="atco-lbl">ATCO</span>
+          <span class="atco-val">${esc(stop.atco)}</span>
         </div>
+        ${renderDeps(deps)}
       `;
       c.appendChild(win);
     });
+    document.getElementById('scroll-area').scrollTop = 0;
   }
 
-  function renderTable(deps) {
+  function renderDeps(deps) {
     if (!deps.length) return '<div class="no-deps">[ NO DEPARTURES FOUND ]</div>';
-    const rows = deps.map(dep => {
+    return deps.map(dep => {
       const route = esc(dep.line_name || dep.line || '?');
       const dest  = esc((dep.direction || dep.direction_name || dep.destination_name || 'UNKNOWN').toUpperCase());
       const op    = esc((dep.operator_name || dep.operator || '').toUpperCase());
-      const dm    = diffMin(dep);
-      const isLive = dep.source === 'Realtime';
-      const timeStr = dep.best_departure_estimate || dep.expected_departure_time || dep.aimed_departure_time || '--:--';
-      let displayTime = timeStr;
-      let timeClass = '';
-      let badgeClass = 'sched';
-      let badgeLabel = 'SCHD';
+      const dm    = minsAway(dep);
+      const live  = dep.source === 'Realtime';
+      const t     = dep.best_departure_estimate || dep.expected_departure_time || dep.aimed_departure_time || '--:--';
 
+      let display = t, tClass = '', sClass = 'sched', sLabel = 'SCHD';
       if (dm !== null) {
-        if (dm <= 0)       { displayTime = 'DUE';        timeClass = 'due'; badgeClass = 'due';  badgeLabel = 'DUE'; }
-        else if (dm < 60)  { displayTime = dm + ' MIN'; }
-        if (isLive && dm > 0) { badgeClass = 'live'; badgeLabel = 'LIVE'; }
-        if (dm <= 1)       { badgeClass = 'due'; badgeLabel = 'DUE'; }
+        if (dm <= 0)      { display = 'DUE';      tClass = 'due'; sClass = 'due';  sLabel = 'DUE'; }
+        else if (dm < 60) { display = dm + ' MIN'; }
+        if (live && dm > 0) { sClass = 'live'; sLabel = 'LIVE'; }
+        if (dm <= 1)        { sClass = 'due';  sLabel = 'DUE'; }
       }
 
       return `
-        <tr>
-          <td><span class="route-num">${route}</span></td>
-          <td>
+        <div class="dep-row">
+          <div class="dep-badge">${route}</div>
+          <div class="dep-info">
             <div class="dep-dest">${dest}</div>
             ${op ? `<div class="dep-op">${op}</div>` : ''}
-          </td>
-          <td class="dep-time-cell hide-sm">
-            <span class="dep-time ${timeClass}">${esc(displayTime)}</span>
-          </td>
-          <td class="dep-status-cell">
-            <span class="live-tag ${badgeClass}">${badgeLabel}</span>
-          </td>
-        </tr>
+          </div>
+          <div class="dep-right">
+            <div class="dep-time ${tClass}">${esc(display)}</div>
+            <div class="dep-status ${sClass}">${sLabel}</div>
+          </div>
+        </div>
       `;
     }).join('');
-
-    return `
-      <table class="dep-table">
-        <thead>
-          <tr>
-            <th>LINE</th>
-            <th>DESTINATION</th>
-            <th class="right hide-sm">TIME</th>
-            <th class="right">STATUS</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
   }
 
   /* ── SKELETONS ── */
   function renderSkeletons() {
-    const skelRows = [0,1,2,3,4].map(() => `
-      <tr>
-        <td><div class="skel" style="width:44px;height:22px"></div></td>
-        <td><div class="skel" style="width:70%;height:16px;margin-bottom:4px"></div><div class="skel" style="width:40%;height:10px"></div></td>
-        <td class="hide-sm"><div class="skel" style="width:52px;height:20px;float:right"></div></td>
-        <td><div class="skel" style="width:36px;height:16px;float:right"></div></td>
-      </tr>`).join('');
-
-    document.getElementById('stops-container').innerHTML = [0,1].map((_, i) => `
-      <div class="window" style="margin-bottom:20px">
-        <div class="window-titlebar">
+    const skRow = () => `
+      <div class="sk-dep-row">
+        <div class="sk" style="width:46px;height:30px;flex-shrink:0"></div>
+        <div style="flex:1;min-width:0;padding:0 10px">
+          <div class="sk" style="width:72%;height:18px;margin-bottom:5px"></div>
+          <div class="sk" style="width:42%;height:11px"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+          <div class="sk" style="width:52px;height:22px"></div>
+          <div class="sk" style="width:34px;height:11px"></div>
+        </div>
+      </div>`;
+    document.getElementById('stops-container').innerHTML = [0,1].map(() => `
+      <div class="stop-win" style="margin-bottom:14px">
+        <div class="win-chrome">
           <div class="win-dots" aria-hidden="true">
-            <div class="win-dot r"></div><div class="win-dot y"></div><div class="win-dot g"></div>
+            <div class="wd r"></div><div class="wd y"></div><div class="wd g"></div>
           </div>
-          <div class="skel" style="width:180px;height:8px;margin:0 8px"></div>
+          <div class="sk" style="flex:1;height:8px;margin:0 8px"></div>
         </div>
-        <div class="window-body">
-          <div class="atco-row"><div class="skel" style="width:120px;height:10px"></div></div>
-          <table class="dep-table">
-            <thead><tr>
-              <th>LINE</th><th>DESTINATION</th>
-              <th class="right hide-sm">TIME</th><th class="right">STATUS</th>
-            </tr></thead>
-            <tbody>${skelRows}</tbody>
-          </table>
-        </div>
+        <div class="win-atco"><div class="sk" style="width:110px;height:10px"></div></div>
+        ${[0,1,2,3,4].map(skRow).join('')}
       </div>`).join('');
   }
 
@@ -819,10 +875,10 @@
     return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
   }
 
-  function diffMin(dep) {
-    const str = dep.best_departure_estimate || dep.expected_departure_time || dep.aimed_departure_time;
-    if (!str) return null;
-    const m = str.match(/^(\d{1,2}):(\d{2})$/);
+  function minsAway(dep) {
+    const s = dep.best_departure_estimate || dep.expected_departure_time || dep.aimed_departure_time;
+    if (!s) return null;
+    const m = s.match(/^(\d{1,2}):(\d{2})$/);
     if (!m) return null;
     const now = new Date();
     let d = (parseInt(m[1])*60 + parseInt(m[2])) - (now.getHours()*60 + now.getMinutes());
