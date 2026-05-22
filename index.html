@@ -1,532 +1,846 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brooke Marsden Portraits | Hand-Drawn Pet Portraits</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .hero-pattern {
-            background-image: radial-gradient(circle, #f3f4f6 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        .portrait-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        .drawing-effect {
-            position: relative;
-        }
-        .drawing-effect::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%);
-            pointer-events: none;
-        }
-        .sketch-border {
-            border: 1px solid #e5e7eb;
-            position: relative;
-        }
-        .sketch-border::before {
-            content: "";
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            border: 1px dashed #d1d5db;
-            pointer-events: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bee Network Live Departures</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bee-yellow: #FFD100;
+      --bee-yellow-dark: #E6BC00;
+      --bee-black: #111111;
+      --bee-dark: #1A1A1A;
+      --bee-grey: #2A2A2A;
+      --bee-mid: #444444;
+      --bee-light: #CCCCCC;
+      --bee-white: #F8F5E4;
+      --live-green: #00E676;
+      --sched-blue: #60A5FA;
+      --font-ui: 'Barlow', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bee-black);
+      color: var(--bee-white);
+      font-family: var(--font-ui);
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--bee-yellow);
+      padding: 0 1.5rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bee-logo {
+      width: 36px;
+      height: 36px;
+    }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--bee-black);
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+    .header-title span {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    .refresh-btn {
+      background: var(--bee-black);
+      color: var(--bee-yellow);
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.15s;
+    }
+    .refresh-btn:hover { opacity: 0.85; }
+    .refresh-btn:disabled { opacity: 0.4; cursor: default; }
+
+    /* ── SETUP SCREEN ── */
+    #setup-screen {
+      max-width: 520px;
+      margin: 4rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .setup-card {
+      background: var(--bee-dark);
+      border: 1px solid var(--bee-grey);
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    .setup-card h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--bee-yellow);
+      margin-bottom: 0.5rem;
+    }
+
+    .setup-card p {
+      font-size: 0.9rem;
+      color: var(--bee-light);
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 1rem;
+      align-items: flex-start;
+    }
+    .step-num {
+      background: var(--bee-yellow);
+      color: var(--bee-black);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-text {
+      font-size: 0.88rem;
+      color: var(--bee-light);
+      line-height: 1.5;
+    }
+    .step-text a {
+      color: var(--bee-yellow);
+      text-decoration: none;
+    }
+    .step-text a:hover { text-decoration: underline; }
+    .step-text code {
+      background: var(--bee-grey);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: #ddd;
+    }
+
+    .key-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 1.5rem;
+    }
+    .key-input {
+      flex: 1;
+      background: var(--bee-grey);
+      border: 1px solid var(--bee-mid);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--bee-white);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .key-input:focus { border-color: var(--bee-yellow); }
+    .key-input::placeholder { color: var(--bee-mid); }
+
+    .go-btn {
+      background: var(--bee-yellow);
+      color: var(--bee-black);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .go-btn:hover { background: var(--bee-yellow-dark); }
+
+    /* ── MAIN SCREEN ── */
+    #main-screen {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+
+    /* ── STATUS BAR ── */
+    #status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+      font-size: 0.82rem;
+      color: var(--bee-light);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--bee-mid);
+    }
+    .status-dot.green { background: var(--live-green); box-shadow: 0 0 6px var(--live-green); }
+    .status-dot.yellow { background: var(--bee-yellow); }
+    .status-dot.red { background: #f87171; }
+
+    /* ── STOP CARD ── */
+    .stop-card {
+      background: var(--bee-dark);
+      border: 1px solid var(--bee-grey);
+      border-radius: 12px;
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+
+    .stop-header {
+      background: var(--bee-grey);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .stop-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .stop-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--bee-yellow);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .stop-icon svg { width: 18px; height: 18px; }
+
+    .stop-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--bee-white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stop-meta {
+      font-size: 0.75rem;
+      color: var(--bee-light);
+      margin-top: 2px;
+    }
+
+    .stop-distance {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--bee-yellow);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── DEPARTURES TABLE ── */
+    .departures {
+      padding: 4px 0;
+    }
+
+    .departure-row {
+      display: grid;
+      grid-template-columns: 56px 1fr auto auto;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 18px;
+      border-bottom: 1px solid var(--bee-grey);
+      transition: background 0.1s;
+    }
+    .departure-row:last-child { border-bottom: none; }
+    .departure-row:hover { background: rgba(255,255,255,0.03); }
+
+    .route-badge {
+      background: var(--bee-yellow);
+      color: var(--bee-black);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 5px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .departure-dest {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--bee-white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .departure-op {
+      font-size: 0.72rem;
+      color: var(--bee-light);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .departure-time {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--bee-white);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .departure-status {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .status-live { color: var(--live-green); }
+    .status-sched { color: var(--sched-blue); }
+    .status-due { color: var(--bee-yellow); }
+
+    /* ── EMPTY / ERROR STATES ── */
+    .state-msg {
+      padding: 24px 18px;
+      text-align: center;
+      color: var(--bee-light);
+      font-size: 0.88rem;
+    }
+
+    /* ── SKELETON LOADER ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bee-grey) 25%, var(--bee-mid) 50%, var(--bee-grey) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skel-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--bee-grey);
+    }
+    .skel-row:last-child { border-bottom: none; }
+
+    /* ── UPDATED TIME ── */
+    .updated-time {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--bee-mid);
+      margin-top: 1rem;
+    }
+
+    /* ── ERROR BANNER ── */
+    .error-banner {
+      background: rgba(248,113,113,0.12);
+      border: 1px solid rgba(248,113,113,0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: #fca5a5;
+      margin-bottom: 1.25rem;
+      display: none;
+    }
+
+    /* ── HEX PATTERN BACKGROUND ── */
+    .hex-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      opacity: 0.025;
+    }
+    .hex-bg svg { width: 100%; height: 100%; }
+
+    #main-screen, #setup-screen { position: relative; z-index: 1; }
+    header { position: sticky; z-index: 100; }
+
+    @media (max-width: 480px) {
+      .departure-row { grid-template-columns: 48px 1fr auto; }
+      .departure-status { display: none; }
+    }
+  </style>
 </head>
-<body class="bg-gray-50 font-sans antialiased">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <i class="fas fa-paw text-gray-800 text-2xl mr-2"></i>
-                        <span class="text-xl font-serif font-bold text-gray-900">Brooke Marsden Portraits</span>
-                    </div>
-                </div>
-                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                    <a href="#gallery" class="border-gray-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Gallery</a>
-                    <a href="#process" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Process</a>
-                    <a href="#contact" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact</a>
-                </div>
-                <div class="-mr-2 flex items-center sm:hidden">
-                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500" aria-controls="mobile-menu" aria-expanded="false" id="mobile-menu-button">
-                        <span class="sr-only">Open main menu</span>
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
+<body>
 
-        <!-- Mobile menu -->
-        <div class="sm:hidden hidden" id="mobile-menu">
-            <div class="pt-2 pb-3 space-y-1">
-                <a href="#gallery" class="bg-gray-50 border-gray-500 text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Gallery</a>
-                <a href="#process" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Process</a>
-                <a href="#contact" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Contact</a>
-            </div>
-        </div>
-    </nav>
+<!-- Subtle hex background -->
+<div class="hex-bg" aria-hidden="true">
+  <svg xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="hex" x="0" y="0" width="60" height="52" patternUnits="userSpaceOnUse">
+        <polygon points="30,2 58,17 58,47 30,62 2,47 2,17" fill="none" stroke="#FFD100" stroke-width="1"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#hex)"/>
+  </svg>
+</div>
 
-    <!-- Hero Section -->
-    <div class="hero-pattern">
-        <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h1 class="text-4xl tracking-tight font-serif font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                    <span class="block">Timeless Black & White</span>
-                    <span class="block text-gray-600">Pet Portraits</span>
-                </h1>
-                <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-                    Hand-drawn portraits that capture the unique personality of your beloved pets. Each piece is carefully crafted with attention to detail and emotion.
-                </p>
-                <div class="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-                    <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                        <a href="#gallery" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-gray-800 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10">
-                            View Gallery
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-left">
+    <svg class="bee-logo" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="18" cy="18" r="18" fill="#111111"/>
+      <!-- Bee body -->
+      <ellipse cx="18" cy="20" rx="7" ry="9" fill="#FFD100"/>
+      <rect x="11" y="17" width="14" height="3" rx="1.5" fill="#111"/>
+      <rect x="11" y="21" width="14" height="3" rx="1.5" fill="#111"/>
+      <!-- Wings -->
+      <ellipse cx="9" cy="14" rx="5" ry="3" fill="white" opacity="0.8" transform="rotate(-20 9 14)"/>
+      <ellipse cx="27" cy="14" rx="5" ry="3" fill="white" opacity="0.8" transform="rotate(20 27 14)"/>
+      <!-- Head -->
+      <circle cx="18" cy="11" r="4" fill="#FFD100"/>
+      <!-- Antennae -->
+      <line x1="16" y1="8" x2="13" y2="5" stroke="#111" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="20" y1="8" x2="23" y2="5" stroke="#111" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="13" cy="5" r="1.2" fill="#111"/>
+      <circle cx="23" cy="5" r="1.2" fill="#111"/>
+    </svg>
+    <div class="header-title">
+      Bee Network
+      <span>Live Departures</span>
+    </div>
+  </div>
+  <button class="refresh-btn" id="refresh-btn" onclick="refreshData()" style="display:none">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    Refresh
+  </button>
+</header>
+
+<!-- ── SETUP SCREEN ── -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <h2>Get started</h2>
+    <p>This app uses the TfGM Open Data API to fetch live bus departures. You'll need a free API key to get going.</p>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">
+        Go to <a href="https://developer.tfgm.com" target="_blank" rel="noopener">developer.tfgm.com</a> and create a free account.
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">
+        Subscribe to the <strong style="color:#ddd">Bus Stop Schedules</strong> product under the Products menu.
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">
+        Copy your <code>Primary Key</code> from your profile, then paste it below and click <strong style="color:#ddd">Go</strong>.
+      </div>
     </div>
 
-    <!-- Featured Portrait -->
-    <div class="bg-white">
-        <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-            <div class="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
-                <div class="relative">
-                    <div class="sketch-border rounded-lg overflow-hidden">
-                        <img class="w-full h-auto drawing-effect" src="https://raw.githubusercontent.com/kyleWinner/kyleWinner.github.io/refs/heads/main/Photos/Choc%20Lab%20original.jpg" alt="Featured dog portrait">
-                    </div>
-                    <div class="mt-4 text-sm text-gray-500 text-center">
-                        "Max" - Labrador Retriever (2023)
-                    </div>
-                </div>
-                <div class="mt-12 lg:mt-0">
-                    <h2 class="text-3xl font-serif font-extrabold text-gray-900 tracking-tight sm:text-4xl">
-                        Capturing the Soul of Your Pet
-                    </h2>
-                    <p class="mt-3 text-lg text-gray-500">
-                        Each portrait begins with your photograph and transforms into a hand-drawn masterpiece. I specialise in black and white techniques that highlight the unique character and expressions of your pet.
-                    </p>
-                    <div class="mt-8">
-                        <div class="inline-flex rounded-md shadow">
-                            <a href="#process" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-800 bg-gray-100 hover:bg-gray-200">
-                                Learn About My Process
-                                <i class="fas fa-arrow-right ml-2"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="key-input-row">
+      <input
+        class="key-input"
+        id="api-key-input"
+        type="text"
+        placeholder="Paste your TfGM API key here"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+      />
+      <button class="go-btn" onclick="startApp()">Go →</button>
     </div>
+    <p style="margin-top:0.75rem; font-size:0.78rem; color: var(--bee-mid);">
+      Your key is saved in your browser's local storage — it never leaves your device.
+    </p>
+  </div>
+</div>
 
-    <!-- Gallery Section -->
-    <div id="gallery" class="bg-gray-50 py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center">
-                <h2 class="text-3xl font-serif font-extrabold text-gray-900 sm:text-4xl">
-                    Recent Portraits
-                </h2>
-                <p class="mt-4 max-w-xl mx-auto text-base text-gray-500">
-                    Browse through some of my recent commissioned works. Each portrait tells a story.
-                </p>
-            </div>
-            <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                <!-- Portrait 1 -->
-                <div class="group relative bg-white rounded-lg overflow-hidden shadow-md portrait-hover transition-all duration-300">
-                    <div class="aspect-w-4 aspect-h-3">
-                        <img class="w-full h-full object-cover" src="https://raw.githubusercontent.com/kyleWinner/kyleWinner.github.io/refs/heads/main/Photos/Short%20dog%20drawn.jpg" alt="Portrait of a golden retriever">
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-medium text-gray-900">"xxxxx" - Dog</h3>
-                        <p class="mt-1 text-sm text-gray-500">A5"</p>
-                        <div class="mt-2 flex items-center">
-                            <div class="flex items-center">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <span class="ml-2 text-sm text-gray-500">5.0 (24)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Portrait 2 -->
-                <div class="group relative bg-white rounded-lg overflow-hidden shadow-md portrait-hover transition-all duration-300">
-                    <div class="aspect-w-4 aspect-h-3">
-                        <img class="w-full h-full object-cover" src="https://raw.githubusercontent.com/kyleWinner/kyleWinner.github.io/refs/heads/main/Photos/Lab%20Drawn.jpg" alt="Labrador portrait">
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-medium text-gray-900">"xxxx" - Labrador</h3>
-                        <p class="mt-1 text-sm text-gray-500">A4</p>
-                        <div class="mt-2 flex items-center">
-                            <div class="flex items-center">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star-half-alt text-yellow-400"></i>
-                                <span class="ml-2 text-sm text-gray-500">4.8 (17)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Portrait 3 -->
-                <div class="group relative bg-white rounded-lg overflow-hidden shadow-md portrait-hover transition-all duration-300">
-                    <div class="aspect-w-4 aspect-h-3">
-                        <img class="w-full h-full object-cover" src="https://raw.githubusercontent.com/kyleWinner/kyleWinner.github.io/refs/heads/main/Photos/Staff%20drawn.jpg" alt="Portrait of a bulldog">
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-medium text-gray-900">"xxxx" - Staffy</h3>
-                        <p class="mt-1 text-sm text-gray-500">A4</p>
-                        <div class="mt-2 flex items-center">
-                            <div class="flex items-center">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <span class="ml-2 text-sm text-gray-500">5.0 (31)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-         </div>
-    </div>
+<!-- ── MAIN SCREEN ── -->
+<div id="main-screen" style="display:none">
+  <div id="error-banner" class="error-banner"></div>
+  <div id="status-bar">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">Finding your location…</span>
+  </div>
+  <div id="stops-container"></div>
+  <div class="updated-time" id="updated-time"></div>
+</div>
 
-    <!-- Process Section -->
-    <div id="process" class="bg-gray-50 py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center">
-                <h2 class="text-3xl font-serif font-extrabold text-gray-900 sm:text-4xl">
-                    My Creative Process
-                </h2>
-                <p class="mt-4 max-w-xl mx-auto text-base text-gray-500">
-                    From your photo to a finished portrait - here's how it works
-                </p>
+<script>
+  const STORAGE_KEY = 'bee_tfgm_api_key';
+  let apiKey = '';
+  let refreshTimer = null;
+
+  /* ── INIT ── */
+  window.addEventListener('DOMContentLoaded', () => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      apiKey = stored;
+      showMain();
+    }
+  });
+
+  function startApp() {
+    const val = document.getElementById('api-key-input').value.trim();
+    if (!val) return;
+    apiKey = val;
+    localStorage.setItem(STORAGE_KEY, apiKey);
+    showMain();
+  }
+
+  function showMain() {
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    document.getElementById('refresh-btn').style.display = 'flex';
+    refreshData();
+    clearInterval(refreshTimer);
+    refreshTimer = setInterval(refreshData, 60000);
+  }
+
+  /* ── STATUS ── */
+  function setStatus(type, text) {
+    const dot = document.getElementById('status-dot');
+    const txt = document.getElementById('status-text');
+    dot.className = 'status-dot ' + (type || '');
+    txt.textContent = text;
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-banner');
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 8000);
+  }
+
+  /* ── MAIN FLOW ── */
+  async function refreshData() {
+    const btn = document.getElementById('refresh-btn');
+    btn.disabled = true;
+    setStatus('yellow', 'Finding your location…');
+    showSkeletons();
+
+    try {
+      const pos = await getLocation();
+      const { latitude: lat, longitude: lon } = pos.coords;
+      setStatus('yellow', 'Finding nearest bus stops…');
+
+      const stops = await findNearbyStops(lat, lon);
+      if (!stops.length) {
+        setStatus('red', 'No bus stops found nearby.');
+        document.getElementById('stops-container').innerHTML =
+          '<div class="state-msg">No bus stops found within 600 m. Try moving to a busier area.</div>';
+        btn.disabled = false;
+        return;
+      }
+
+      setStatus('yellow', `Found ${stops.length} stops — fetching departures…`);
+      const top2 = stops.slice(0, 2);
+
+      const results = await Promise.all(top2.map(s => getDepartures(s)));
+      renderStops(results);
+      setStatus('green', 'Live');
+      document.getElementById('updated-time').textContent =
+        'Last updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    } catch (err) {
+      console.error(err);
+      setStatus('red', 'Error — ' + (err.message || 'Something went wrong'));
+      showError(err.message || 'Could not load departures. Check your API key and try again.');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  /* ── GEOLOCATION ── */
+  function getLocation() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation is not supported by your browser.'));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(resolve, err => {
+        reject(new Error('Location access denied. Please allow location access and try again.'));
+      }, { enableHighAccuracy: true, timeout: 10000 });
+    });
+  }
+
+  /* ── FIND NEARBY STOPS (Overpass API) ── */
+  async function findNearbyStops(lat, lon, radius = 600) {
+    const query = `
+      [out:json][timeout:15];
+      node[highway=bus_stop](around:${radius},${lat},${lon});
+      out body;
+    `.trim();
+
+    const url = 'https://overpass-api.de/api/interpreter';
+    const res = await fetch(url, {
+      method: 'POST',
+      body: query,
+      headers: { 'Content-Type': 'text/plain' }
+    });
+    if (!res.ok) throw new Error('Could not reach Overpass API to find nearby stops.');
+
+    const data = await res.json();
+    const nodes = data.elements || [];
+
+    return nodes
+      .map(n => {
+        const atco = n.tags?.['naptan:AtcoCode'] || n.tags?.['ref'];
+        const name = n.tags?.name || n.tags?.['naptan:CommonName'] || 'Bus Stop';
+        if (!atco) return null;
+        return {
+          atco,
+          name,
+          lat: n.lat,
+          lon: n.lon,
+          dist: haversine(lat, lon, n.lat, n.lon)
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.dist - b.dist);
+  }
+
+  /* ── HAVERSINE ── */
+  function haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 +
+              Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+              Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  /* ── GET DEPARTURES (TfGM OData API) ── */
+  async function getDepartures(stop) {
+    const encoded = encodeURIComponent(stop.atco);
+    const url = `https://api.tfgm.com/odata/busstopschedules?atcoCode=${encoded}&$top=8&$orderby=DepartureTime`;
+
+    const res = await fetch(url, {
+      headers: {
+        'Ocp-Apim-Subscription-Key': apiKey,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (res.status === 401 || res.status === 403) {
+      // Wipe bad key so user can re-enter
+      localStorage.removeItem(STORAGE_KEY);
+      throw new Error('Invalid API key. Please refresh the page and re-enter your TfGM key.');
+    }
+
+    if (!res.ok) {
+      return { stop, departures: [] };
+    }
+
+    const data = await res.json();
+    const items = data.value || data.d?.results || data.d || [];
+    return { stop, departures: items };
+  }
+
+  /* ── RENDER ── */
+  function renderStops(results) {
+    const container = document.getElementById('stops-container');
+    container.innerHTML = '';
+
+    results.forEach(({ stop, departures }) => {
+      const dist = stop.dist < 1000
+        ? Math.round(stop.dist) + ' m'
+        : (stop.dist / 1000).toFixed(1) + ' km';
+
+      const card = document.createElement('div');
+      card.className = 'stop-card';
+
+      card.innerHTML = `
+        <div class="stop-header">
+          <div class="stop-header-left">
+            <div class="stop-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="1" y="3" width="15" height="13" rx="2"/>
+                <path d="M16 8h4l3 3v5h-7V8z"/>
+                <circle cx="5.5" cy="18.5" r="2.5"/>
+                <circle cx="18.5" cy="18.5" r="2.5"/>
+              </svg>
             </div>
-            
-            <div class="mt-12">
-                <div class="lg:grid lg:grid-cols-3 lg:gap-8">
-                    <div class="relative">
-                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-gray-800 text-white">
-                            <span class="text-xl font-bold">1</span>
-                        </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900">Submit Your Photo</h3>
-                        <p class="mt-2 text-base text-gray-500">
-                            Message me your favorite high-quality photos of your pet. The better the photo, the better the portrait! Send multiple and We'll review it and confirm details.
-                        </p>
-                    </div>
-                    
-                    <div class="mt-10 lg:mt-0 relative">
-                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-gray-800 text-white">
-                            <span class="text-xl font-bold">2</span>
-                        </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900">Approval & Deposit</h3>
-                        <p class="mt-2 text-base text-gray-500">
-                            Once approved, I'll send an invoice to secure your spot in my queue. At this stage, a 20% deposit is required to begin the work.
-                        </p>
-                    </div>
-                    
-                    <div class="mt-10 lg:mt-0 relative">
-                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-gray-800 text-white">
-                            <span class="text-xl font-bold">3</span>
-                        </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900">Creation & Approval</h3>
-                        <p class="mt-2 text-base text-gray-500">
-                            I'll create your portrait and send a digital proof for your approval. Minor adjustments can be made at this stage.
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="lg:grid lg:grid-cols-3 lg:gap-8 mt-12">
-                    <div class="relative">
-                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-gray-800 text-white">
-                            <span class="text-xl font-bold">4</span>
-                        </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900">Final Payment</h3>
-                        <p class="mt-2 text-base text-gray-500">
-                            Once approved, you will pay the remaining cost of the portrait.
-                        </p>
-                    </div>
-                    
-                    <div class="mt-10 lg:mt-0 relative">
-                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-gray-800 text-white">
-                            <span class="text-xl font-bold">5</span>
-                        </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900">Careful Packaging</h3>
-                        <p class="mt-2 text-base text-gray-500">
-                            Your portrait will be carefully packaged to ensure it arrives in perfect condition.
-                        </p>
-                    </div>
-                    
-                    <div class="mt-10 lg:mt-0 relative">
-                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-gray-800 text-white">
-                            <span class="text-xl font-bold">6</span>
-                        </div>
-                        <h3 class="mt-6 text-lg font-medium text-gray-900">Shipping & Tracking</h3>
-                        <p class="mt-2 text-base text-gray-500">
-                            Your portrait will be shipped with tracking information. You can expect it to arrive within 1 week, depending on your location.
-                        </p>
-                    </div>
-                </div>
+            <div>
+              <div class="stop-name">${escHtml(stop.name)}</div>
+              <div class="stop-meta">ATCO: ${escHtml(stop.atco)}</div>
             </div>
-            
-            <div class="mt-12 bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-medium text-gray-900">Photo Requirements</h3>
-                <p class="mt-2 text-base text-gray-500">
-                    To ensure the best possible portrait, please provide a high-resolution photo with:
-                </p>
-                <ul class="mt-4 space-y-2">
-                    <li class="flex items-start">
-                        <i class="fas fa-check text-green-500 mt-1"></i>
-                        <span class="ml-2 text-gray-700">Clear, well-lit image (natural light is best)</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-check text-green-500 mt-1"></i>
-                        <span class="ml-2 text-gray-700">High resolution</span>
-                    </li>
-                    <li class="flex items-start">
-                        <i class="fas fa-check text-green-500 mt-1"></i>
-                        <span class="ml-2 text-gray-700">The pose/expression you want captured</span>
-                    </li>
-                </ul>
-            </div>
+          </div>
+          <div class="stop-distance">${dist}</div>
         </div>
-    </div>
-
-    <!-- Testimonials -->
-    <div class="bg-white py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center">
-                <h2 class="text-3xl font-serif font-extrabold text-gray-900 sm:text-4xl">
-                    What Clients Say
-                </h2>
-                <p class="mt-4 max-w-xl mx-auto text-base text-gray-500">
-                    Don't just take my word for it - hear from happy pet owners
-                </p>
-            </div>
-            
-            <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                <!-- Testimonial 1 -->
-                <div class="bg-gray-50 p-6 rounded-lg">
-                    <div class="flex items-center">
-                        <div class="ml-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                            </div>
-                            <div class="text-sm font-medium text-gray-900">Jessica T.</div>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <p class="text-gray-600 italic">
-                            "The portrait Brooke did of Lola was absolutely amazing. It was far better than we ever could of imagined and captured her beautifully. Brooke is very talented and we would highly recommend her.                     "
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Testimonial 2 -->
-                <div class="bg-gray-50 p-6 rounded-lg">
-                    <div class="flex items-center">
-                        <div class="ml-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                            </div>
-                            <div class="text-sm font-medium text-gray-900">Patricia S.</div>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <p class="text-gray-600 italic">
-                            "Amazing, talented, polite young lady. Brooke made mybeloved pooch portrait, and i can say it is absolutelybeautiful, captures his look and personality so well, I'm beyond happy, words can't describe. I wish Brooke the very best and i will recomend her to everyone i know. xxx"
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Testimonial 3 -->
-                <div class="bg-gray-50 p-6 rounded-lg">
-                    <div class="flex items-center">
-                        <div class="ml-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star-half-alt text-yellow-400"></i>
-                            </div>
-                            <div class="text-sm font-medium text-gray-900">Richard H.</div>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <p class="text-gray-600 italic">
-                            "absolutely loved the picture of our fur boy Ted... Brooke captured everything 😍 would HIGHLY RECOMMEND which I have done already. Pete loved his drawing for his birthday of his boy.cant thank you enough"
-                        </p>
-                    </div>
-                </div>
-            </div>
+        <div class="departures">
+          ${renderDepartures(departures)}
         </div>
-    </div>
+      `;
+      container.appendChild(card);
+    });
+  }
 
-    <!-- Contact Section -->
-    <div id="contact" class="bg-gray-800 py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="lg:grid lg:grid-cols-2 lg:gap-8">
-                <div class="text-white">
-                    <h2 class="text-3xl font-serif font-extrabold sm:text-4xl">
-                        Ready to Commission Your Portrait?
-                    </h2>
-                    <p class="mt-3 text-lg text-gray-300">
-                        Have questions or ready to get started? Fill out the form or contact me directly.
-                    </p>
-                    <div class="mt-9">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-envelope text-gray-300 text-xl"></i>
-                            </div>
-                            <div class="ml-3 text-base text-gray-300">
-                                <p>brooke@yipiyap.com</p>
-                            </div>
-                        </div>
-                        <div class="mt-6 flex">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-phone-alt text-gray-300 text-xl"></i>
-                            </div>
-                            <div class="ml-3 text-base text-gray-300">
-                                <p>07957 636536</p>
-                            </div>
-                        </div>
-                        <div class="mt-6 flex">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-map-marker-alt text-gray-300 text-xl"></i>
-                            </div>
-                            <div class="ml-3 text-base text-gray-300">
-                                <p>Based in Altricham, England</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-12">
-                        <h3 class="text-lg font-medium text-white">Follow My Work</h3>
-                        <div class="mt-4 flex space-x-6">
-                            <a href="#" class="text-gray-300 hover:text-white">
-                                <i class="fab fa-instagram text-2xl"></i>
-                            </a>
-                            <a href="#" class="text-gray-300 hover:text-white">
-                                <i class="fab fa-facebook text-2xl"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScupX4C_yQLJ1cV0dTbpeoRkceVlXeJNd5tQpaCqe_6kYwwWQ/viewform?embedded=true" width="640" height="986" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
-            </div>
+  function renderDepartures(deps) {
+    if (!deps || !deps.length) {
+      return '<div class="state-msg">No departures found for this stop right now.</div>';
+    }
+
+    return deps.slice(0, 8).map(dep => {
+      const route = dep.ServiceNumber || dep.RouteNumber || dep.LineName || '?';
+      const dest  = dep.Destination || dep.DirectionDescription || dep.DestinationDisplay || '—';
+      const op    = dep.OperatorName || dep.Operator || '';
+      const isLive = dep.IsRealTime === true || dep.IsLive === true || dep.IsRealTime === 'true';
+
+      let timeStr = '—';
+      let statusLabel = '';
+      let statusClass = '';
+
+      const rawTime = dep.DepartureTime || dep.ExpectedDepartureTime || dep.AimedDepartureTime;
+      if (rawTime) {
+        const t = parseTime(rawTime);
+        if (t) {
+          const now = new Date();
+          const diffMin = Math.round((t - now) / 60000);
+          if (diffMin <= 0) {
+            timeStr = 'Due';
+            statusClass = 'status-due';
+          } else if (diffMin < 60) {
+            timeStr = diffMin + ' min';
+          } else {
+            timeStr = t.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+          }
+
+          if (diffMin <= 1) {
+            statusLabel = 'Due';
+            statusClass = 'status-due';
+          } else if (isLive) {
+            statusLabel = 'Live';
+            statusClass = 'status-live';
+          } else {
+            statusLabel = 'Sched';
+            statusClass = 'status-sched';
+          }
+        }
+      }
+
+      return `
+        <div class="departure-row">
+          <div class="route-badge">${escHtml(route)}</div>
+          <div>
+            <div class="departure-dest">${escHtml(dest)}</div>
+            ${op ? `<div class="departure-op">${escHtml(op)}</div>` : ''}
+          </div>
+          <div class="departure-time">${escHtml(timeStr)}</div>
+          <div class="departure-status ${statusClass}">${statusLabel}</div>
         </div>
-    </div>
+      `;
+    }).join('');
+  }
 
-    <!-- Footer -->
-    <footer class="bg-gray-900">
-        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div class="xl:grid xl:grid-cols-3 xl:gap-8">
-                <div class="space-y-8 xl:col-span-1">
-                    <div class="flex items-center">
-                        <i class="fas fa-paw text-white text-2xl mr-2"></i>
-                        <span class="text-xl font-serif font-bold text-white">Brooke Marsden Portraits</span>
-                    </div>
-                    <p class="text-gray-300 text-base">
-                        Hand-drawn black and white pet portraits that capture the unique personality of your furry friends.
-                    </p>
-                    <div class="flex space-x-6">
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-instagram text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-facebook text-xl"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="mt-12 grid grid-cols-2 gap-8 xl:mt-0 xl:col-span-2">
-                    <div class="md:grid md:grid-cols-2 md:gap-8">
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Navigation</h3>
-                            <ul class="mt-4 space-y-4">
-                                <li>
-                                    <a href="#gallery" class="text-base text-gray-400 hover:text-white">Gallery</a>
-                                </li>
-                                <li>
-                                    <a href="#process" class="text-base text-gray-400 hover:text-white">Process</a>
-                                </li>
-                                <li>
-                                    <a href="#contact" class="text-base text-gray-400 hover:text-white">Contact</a>
-                                </li>
-                            </ul>
-                        </div>
-                      </div>
-                    </div>
-                </div>
+  /* ── SKELETONS ── */
+  function showSkeletons() {
+    const container = document.getElementById('stops-container');
+    container.innerHTML = [1, 2].map(() => `
+      <div class="stop-card">
+        <div class="stop-header">
+          <div class="stop-header-left">
+            <div class="stop-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
             </div>
-            <div class="mt-12 border-t border-gray-700 pt-8">
-                <p class="text-base text-gray-400 text-center">
-                    &copy; 2025 Brooke Marsden Portraits. All rights reserved.
-                </p>
+            <div>
+              <div class="skeleton" style="width:160px;height:16px;margin-bottom:6px"></div>
+              <div class="skeleton" style="width:90px;height:11px"></div>
             </div>
+          </div>
         </div>
-    </footer>
+        <div class="departures">
+          ${[1,2,3,4].map(() => `
+            <div class="skel-row">
+              <div class="skeleton" style="width:44px;height:28px;border-radius:5px"></div>
+              <div style="flex:1"><div class="skeleton" style="width:80%;height:14px;margin-bottom:5px"></div><div class="skeleton" style="width:50%;height:10px"></div></div>
+              <div class="skeleton" style="width:48px;height:16px"></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
 
-    <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-            } else {
-                menu.classList.add('hidden');
-            }
-        });
+  /* ── HELPERS ── */
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
 
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                    
-                    // Close mobile menu if open
-                    const mobileMenu = document.getElementById('mobile-menu');
-                    if (!mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.add('hidden');
-                    }
-                }
-            });
-        });
-    </script>
+  function parseTime(raw) {
+    if (!raw) return null;
+    // Handle OData /Date(ms)/ format
+    const odataMatch = raw.match(/\/Date\((\d+)/);
+    if (odataMatch) return new Date(parseInt(odataMatch[1]));
+    // Handle ISO or HH:MM
+    const d = new Date(raw);
+    if (!isNaN(d)) return d;
+    // Handle HH:MM:SS string
+    const parts = raw.split(':');
+    if (parts.length >= 2) {
+      const now = new Date();
+      now.setHours(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2] || 0), 0);
+      return now;
+    }
+    return null;
+  }
+
+  /* ── ALLOW ENTER KEY ON INPUT ── */
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('api-key-input');
+    if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') startApp(); });
+  });
+</script>
 </body>
 </html>
