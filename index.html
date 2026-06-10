@@ -5,33 +5,155 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Budget Tracker</title>
 <style>
-  :root { --bg:#0f1115; --card:#1a1d24; --accent:#5b8def; --text:#e6e8eb; --muted:#8b909a; }
+  :root {
+    --bg: #fff5f9;
+    --bg2: #ffeaf3;
+    --card: #ffffff;
+    --accent: #ff7fb6;
+    --accent-dark: #e85a9b;
+    --text: #5a3a4a;
+    --muted: #c08aa0;
+    --line: #ffd9e8;
+    --good: #4caf82;
+    --bad: #e8617f;
+  }
   * { box-sizing: border-box; }
-  body { margin:0; font-family: system-ui, sans-serif; background:var(--bg); color:var(--text); padding:1.5rem; }
-  h1 { font-weight:600; }
-  .wrap { max-width:780px; margin:0 auto; }
-  .card { background:var(--card); border-radius:12px; padding:1.25rem; margin-bottom:1.25rem; }
-  label { display:block; font-size:.85rem; color:var(--muted); margin-bottom:.25rem; }
-  input, select, button { font-size:1rem; padding:.6rem .7rem; border-radius:8px; border:1px solid #2a2e38; background:#12141a; color:var(--text); width:100%; }
-  .row { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-bottom:.75rem; }
-  button { background:var(--accent); border:none; cursor:pointer; font-weight:600; }
-  button:hover { opacity:.9; }
-  table { width:100%; border-collapse:collapse; font-size:.9rem; }
-  th, td { text-align:left; padding:.5rem; border-bottom:1px solid #2a2e38; }
-  th { color:var(--muted); font-weight:500; }
-  .amt { text-align:right; font-variant-numeric:tabular-nums; }
-  .group-total { font-weight:600; color:var(--accent); }
-  .msg { font-size:.85rem; color:var(--muted); min-height:1rem; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background: linear-gradient(160deg, var(--bg), var(--bg2));
+    background-attachment: fixed;
+    color: var(--text);
+    padding: 1.5rem;
+    min-height: 100vh;
+  }
+  h1 {
+    font-weight: 700;
+    text-align: center;
+    color: var(--accent-dark);
+    letter-spacing: .5px;
+    text-shadow: 0 1px 2px rgba(255,127,182,.2);
+  }
+  h1::before { content: "✿ "; }
+  h1::after { content: " ✿"; }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 1.4rem;
+    margin-bottom: 1.4rem;
+    box-shadow: 0 6px 20px rgba(255,127,182,.18);
+    border: 1px solid var(--line);
+  }
+  h2 {
+    margin-top: 0;
+    font-size: 1.15rem;
+    color: var(--accent-dark);
+    font-weight: 700;
+  }
+  label {
+    display: block;
+    font-size: .85rem;
+    color: var(--muted);
+    margin-bottom: .3rem;
+    font-weight: 600;
+  }
+  input, select, button {
+    font-size: 1rem;
+    padding: .65rem .8rem;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    color: var(--text);
+    width: 100%;
+    font-family: inherit;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,127,182,.2);
+  }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; margin-bottom: .85rem; }
+  button {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: .3px;
+    box-shadow: 0 4px 12px rgba(232,90,155,.35);
+    transition: transform .1s, box-shadow .2s;
+  }
+  button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(232,90,155,.45); }
+  button:active { transform: translateY(0); }
+  button:disabled { opacity: .6; cursor: default; transform: none; }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  th, td { text-align: left; padding: .6rem .5rem; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 700; }
+  .amt { text-align: right; font-variant-numeric: tabular-nums; }
+  .group-total td { font-weight: 700; color: var(--accent-dark); border-bottom: none; }
+
+  .month-bar {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    justify-content: center;
+  }
+  .month-bar select { width: auto; min-width: 180px; font-weight: 600; }
+
+  .budget-grid { display: grid; grid-template-columns: 1fr auto; gap: .85rem; align-items: end; }
+  .budget-grid button { width: auto; padding: .65rem 1.2rem; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: .85rem; margin-top: 1rem; }
+  .stat {
+    background: var(--bg);
+    border-radius: 14px;
+    padding: .9rem;
+    text-align: center;
+    border: 1px solid var(--line);
+  }
+  .stat .label { font-size: .75rem; color: var(--muted); font-weight: 600; }
+  .stat .value { font-size: 1.3rem; font-weight: 700; margin-top: .25rem; }
+  .value.good { color: var(--good); }
+  .value.bad { color: var(--bad); }
+
+  .bar-track {
+    height: 12px;
+    background: var(--bg2);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+    transition: width .4s ease;
+  }
+  .bar-fill.over { background: linear-gradient(90deg, #ff9a8b, var(--bad)); }
+
+  .msg { font-size: .85rem; color: var(--accent-dark); min-height: 1rem; font-weight: 600; }
+  @media (max-width: 560px) {
+    .stats { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Budget Tracker</h1>
+  <h1>My Budget Tracker</h1>
 
   <div class="card">
+    <div class="month-bar">
+      <label style="margin:0;">Viewing month</label>
+      <select id="month"></select>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Add Expense</h2>
     <div class="row">
       <div>
-        <label>Amount</label>
+        <label>Amount (£)</label>
         <input type="number" id="amount" step="0.01" placeholder="0.00">
       </div>
       <div>
@@ -49,64 +171,172 @@
         <input type="text" id="note" placeholder="...">
       </div>
     </div>
-    <button id="add">Add Expense</button>
+    <button id="add">Add Expense ♥</button>
     <p class="msg" id="msg"></p>
   </div>
 
   <div class="card">
-    <h2 style="margin-top:0;font-size:1.1rem;">By Category</h2>
+    <h2>Monthly Budget</h2>
+    <div class="budget-grid">
+      <div>
+        <label>Budget for this month (£)</label>
+        <input type="number" id="budgetInput" step="0.01" placeholder="0.00">
+      </div>
+      <button id="saveBudget">Save</button>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="label">Budget</div>
+        <div class="value" id="statBudget">—</div>
+      </div>
+      <div class="stat">
+        <div class="label">Spent</div>
+        <div class="value" id="statSpent">—</div>
+      </div>
+      <div class="stat">
+        <div class="label">Remaining</div>
+        <div class="value" id="statRemaining">—</div>
+      </div>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+    <p class="msg" id="budgetMsg"></p>
+  </div>
+
+  <div class="card">
+    <h2>By Category</h2>
     <table id="summary"></table>
   </div>
 
   <div class="card">
-    <h2 style="margin-top:0;font-size:1.1rem;">All Expenses</h2>
+    <h2>Expenses This Month</h2>
     <table id="list"></table>
   </div>
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_hotGdz0UOf7yiAM6exMqnTgMaHswnPX8ZOuhZX_k0M-JgAlizvMJz8iVkV8bUgQi3w/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBzvLrsTUciTqjOD_3hM9pMkphGdWU4P41SfDynGC4yHfjxy453MHE3N0ruSurYK2Oyg/exec';
 
 const $ = id => document.getElementById(id);
+
+let allExpenses = [];
+let budgets = {};
+
+// today as YYYY-MM-DD for the date input default
 $('date').value = new Date().toISOString().slice(0, 10);
 
+// ---- helpers ----
+function fmt(n) {
+  return n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// turn YYYY-MM-DD into DD/MM/YYYY for display
+function displayDate(iso) {
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+// YYYY-MM key from a YYYY-MM-DD date string
+function monthKey(iso) { return iso.slice(0, 7); }
+
+// "2026-06" -> "June 2026"
+function monthLabel(key) {
+  const [y, m] = key.split('-');
+  const names = ['January','February','March','April','May','June',
+                 'July','August','September','October','November','December'];
+  return `${names[Number(m) - 1]} ${y}`;
+}
+
+// ---- data loading ----
 async function loadCategories() {
   const r = await fetch(SCRIPT_URL + '?action=categories');
   const { categories } = await r.json();
   $('category').innerHTML = categories.map(c => `<option>${c}</option>`).join('');
 }
 
-async function loadExpenses() {
+async function loadAll() {
   const r = await fetch(SCRIPT_URL);
-  const { expenses } = await r.json();
-  renderList(expenses);
-  renderSummary(expenses);
+  const data = await r.json();
+  allExpenses = data.expenses || [];
+  budgets = data.budgets || {};
+  buildMonthList();
+  render();
 }
 
-function fmt(n) { return n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
+// build the month dropdown from existing expenses + current month
+function buildMonthList() {
+  const set = new Set(allExpenses.map(e => monthKey(e.date)));
+  set.add(new Date().toISOString().slice(0, 7));
+  Object.keys(budgets).forEach(k => set.add(k));
+  const months = [...set].sort().reverse();
+  const current = $('month').value || new Date().toISOString().slice(0, 7);
+  $('month').innerHTML = months.map(m =>
+    `<option value="${m}" ${m === current ? 'selected' : ''}>${monthLabel(m)}</option>`
+  ).join('');
+}
+
+// ---- rendering ----
+function render() {
+  const month = $('month').value;
+  const monthExp = allExpenses.filter(e => monthKey(e.date) === month);
+
+  renderList(monthExp);
+  renderSummary(monthExp);
+  renderBudget(month, monthExp);
+}
 
 function renderList(exp) {
+  if (!exp.length) {
+    $('list').innerHTML = `<tr><td style="color:var(--muted)">No expenses yet this month.</td></tr>`;
+    return;
+  }
   const rows = exp.slice().reverse().map(e =>
-    `<tr><td>${e.date}</td><td>${e.category}</td><td>${e.note||''}</td><td class="amt">${fmt(e.amount)}</td></tr>`
+    `<tr><td>${displayDate(e.date)}</td><td>${e.category}</td><td>${e.note || ''}</td><td class="amt">${fmt(e.amount)}</td></tr>`
   ).join('');
-  $('list').innerHTML = `<tr><th>Date</th><th>Category</th><th>Note</th><th class="amt">Amount</th></tr>${rows}`;
+  $('list').innerHTML =
+    `<tr><th>Date</th><th>Category</th><th>Note</th><th class="amt">Amount</th></tr>${rows}`;
 }
 
 function renderSummary(exp) {
   const groups = {};
   let total = 0;
-  exp.forEach(e => { groups[e.category] = (groups[e.category]||0) + e.amount; total += e.amount; });
+  exp.forEach(e => { groups[e.category] = (groups[e.category] || 0) + e.amount; total += e.amount; });
+  if (!Object.keys(groups).length) {
+    $('summary').innerHTML = `<tr><td style="color:var(--muted)">Nothing to summarise yet.</td></tr>`;
+    return;
+  }
   const rows = Object.entries(groups)
-    .sort((a,b) => b[1]-a[1])
-    .map(([cat,sum]) => `<tr><td>${cat}</td><td class="amt">${fmt(sum)}</td></tr>`).join('');
+    .sort((a, b) => b[1] - a[1])
+    .map(([cat, sum]) => `<tr><td>${cat}</td><td class="amt">${fmt(sum)}</td></tr>`).join('');
   $('summary').innerHTML =
     `<tr><th>Category</th><th class="amt">Total</th></tr>${rows}` +
     `<tr class="group-total"><td>Total</td><td class="amt">${fmt(total)}</td></tr>`;
 }
 
+function renderBudget(month, exp) {
+  const budget = budgets[month] || 0;
+  const spent = exp.reduce((s, e) => s + e.amount, 0);
+  const remaining = budget - spent;
+
+  $('budgetInput').value = budget ? budget : '';
+  $('statBudget').textContent = budget ? '£' + fmt(budget) : '—';
+  $('statSpent').textContent = '£' + fmt(spent);
+
+  const remEl = $('statRemaining');
+  remEl.textContent = '£' + fmt(remaining);
+  remEl.className = 'value ' + (remaining < 0 ? 'bad' : 'good');
+
+  const pct = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
+  const fill = $('barFill');
+  fill.style.width = pct + '%';
+  fill.classList.toggle('over', budget > 0 && spent > budget);
+}
+
+// ---- actions ----
+$('month').addEventListener('change', render);
+
 $('add').addEventListener('click', async () => {
   const amount = parseFloat($('amount').value);
-  if (!amount) { $('msg').textContent = 'Enter an amount.'; return; }
+  if (!amount) { $('msg').textContent = 'Please enter an amount.'; return; }
   $('msg').textContent = 'Saving...';
   $('add').disabled = true;
   try {
@@ -121,16 +351,38 @@ $('add').addEventListener('click', async () => {
       })
     });
     $('amount').value = ''; $('note').value = '';
-    $('msg').textContent = 'Saved.';
-    await loadExpenses();
+    $('msg').textContent = 'Saved! ♥';
+    await loadAll();
   } catch (err) {
     $('msg').textContent = 'Error saving.';
   }
   $('add').disabled = false;
 });
 
+$('saveBudget').addEventListener('click', async () => {
+  const budget = parseFloat($('budgetInput').value);
+  if (isNaN(budget)) { $('budgetMsg').textContent = 'Please enter a budget amount.'; return; }
+  const month = $('month').value;
+  $('budgetMsg').textContent = 'Saving budget...';
+  $('saveBudget').disabled = true;
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'setBudget', month, budget })
+    });
+    budgets[month] = budget;
+    $('budgetMsg').textContent = 'Budget saved! ♥';
+    render();
+  } catch (err) {
+    $('budgetMsg').textContent = 'Error saving budget.';
+  }
+  $('saveBudget').disabled = false;
+});
+
+// ---- init ----
 loadCategories();
-loadExpenses();
+loadAll();
 </script>
 </body>
 </html>
