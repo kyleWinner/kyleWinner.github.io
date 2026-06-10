@@ -34,8 +34,8 @@
     letter-spacing: .5px;
     text-shadow: 0 1px 2px rgba(255,127,182,.2);
   }
-  h1::before { content: "✿ "; }
-  h1::after { content: " ✿"; }
+  h1::before { content: "\2740 "; }
+  h1::after { content: " \2740"; }
   .wrap { max-width: 780px; margin: 0 auto; }
   .card {
     background: var(--card);
@@ -87,54 +87,51 @@
   button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(232,90,155,.45); }
   button:active { transform: translateY(0); }
   button:disabled { opacity: .6; cursor: default; transform: none; }
+  .btn-secondary {
+    background: #fff;
+    color: var(--accent-dark);
+    border: 1.5px solid var(--accent);
+    box-shadow: none;
+  }
+  .btn-secondary:hover { background: var(--bg); box-shadow: none; }
   table { width: 100%; border-collapse: collapse; font-size: .92rem; }
   th, td { text-align: left; padding: .6rem .5rem; border-bottom: 1px solid var(--line); }
   th { color: var(--muted); font-weight: 700; }
   .amt { text-align: right; font-variant-numeric: tabular-nums; }
   .group-total td { font-weight: 700; color: var(--accent-dark); border-bottom: none; }
 
-  .month-bar {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    justify-content: center;
+  .del-btn {
+    width: auto;
+    padding: .25rem .55rem;
+    font-size: .8rem;
+    background: #fff;
+    color: var(--bad);
+    border: 1.5px solid var(--line);
+    box-shadow: none;
+    border-radius: 8px;
   }
+  .del-btn:hover { background: #ffeef2; border-color: var(--bad); transform: none; box-shadow: none; }
+
+  .month-bar { display: flex; align-items: center; gap: .75rem; justify-content: center; }
   .month-bar select { width: auto; min-width: 180px; font-weight: 600; }
 
-  .budget-grid { display: grid; grid-template-columns: 1fr auto; gap: .85rem; align-items: end; }
-  .budget-grid button { width: auto; padding: .65rem 1.2rem; }
+  .inline-grid { display: grid; grid-template-columns: 1fr auto; gap: .85rem; align-items: end; }
+  .inline-grid button { width: auto; padding: .65rem 1.2rem; }
 
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: .85rem; margin-top: 1rem; }
-  .stat {
-    background: var(--bg);
-    border-radius: 14px;
-    padding: .9rem;
-    text-align: center;
-    border: 1px solid var(--line);
-  }
-  .stat .label { font-size: .75rem; color: var(--muted); font-weight: 600; }
-  .stat .value { font-size: 1.3rem; font-weight: 700; margin-top: .25rem; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; margin-top: 1rem; }
+  .stat { background: var(--bg); border-radius: 14px; padding: .8rem; text-align: center; border: 1px solid var(--line); }
+  .stat .label { font-size: .72rem; color: var(--muted); font-weight: 600; }
+  .stat .value { font-size: 1.15rem; font-weight: 700; margin-top: .25rem; }
   .value.good { color: var(--good); }
   .value.bad { color: var(--bad); }
 
-  .bar-track {
-    height: 12px;
-    background: var(--bg2);
-    border-radius: 99px;
-    overflow: hidden;
-    margin-top: 1rem;
-  }
-  .bar-fill {
-    height: 100%;
-    border-radius: 99px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-dark));
-    transition: width .4s ease;
-  }
+  .bar-track { height: 12px; background: var(--bg2); border-radius: 99px; overflow: hidden; margin-top: 1rem; }
+  .bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent-dark)); transition: width .4s ease; }
   .bar-fill.over { background: linear-gradient(90deg, #ff9a8b, var(--bad)); }
 
   .msg { font-size: .85rem; color: var(--accent-dark); min-height: 1rem; font-weight: 600; }
   @media (max-width: 560px) {
-    .stats { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
@@ -153,7 +150,7 @@
     <h2>Add Expense</h2>
     <div class="row">
       <div>
-        <label>Amount (£)</label>
+        <label>Amount (&pound;)</label>
         <input type="number" id="amount" step="0.01" placeholder="0.00">
       </div>
       <div>
@@ -171,31 +168,70 @@
         <input type="text" id="note" placeholder="...">
       </div>
     </div>
-    <button id="add">Add Expense ♥</button>
+    <button id="add">Add Expense &hearts;</button>
     <p class="msg" id="msg"></p>
   </div>
 
   <div class="card">
-    <h2>Monthly Budget</h2>
-    <div class="budget-grid">
+    <h2>Add a Category</h2>
+    <div class="inline-grid">
       <div>
-        <label>Budget for this month (£)</label>
+        <label>New category name</label>
+        <input type="text" id="newCategory" placeholder="e.g. Holidays">
+      </div>
+      <button id="addCategory" class="btn-secondary">Add</button>
+    </div>
+    <p class="msg" id="catMsg"></p>
+  </div>
+
+  <div class="card">
+    <h2>Add Income</h2>
+    <p style="margin-top:0;font-size:.85rem;color:var(--muted);">Income is added to the selected month's budget.</p>
+    <div class="row">
+      <div>
+        <label>Amount (&pound;)</label>
+        <input type="number" id="incomeAmount" step="0.01" placeholder="0.00">
+      </div>
+      <div>
+        <label>Date</label>
+        <input type="date" id="incomeDate">
+      </div>
+    </div>
+    <div class="row">
+      <div style="grid-column:1 / -1;">
+        <label>Note (optional)</label>
+        <input type="text" id="incomeNote" placeholder="e.g. Salary">
+      </div>
+    </div>
+    <button id="addIncome">Add Income &hearts;</button>
+    <p class="msg" id="incomeMsg"></p>
+  </div>
+
+  <div class="card">
+    <h2>Monthly Budget</h2>
+    <div class="inline-grid">
+      <div>
+        <label>Base budget for this month (&pound;)</label>
         <input type="number" id="budgetInput" step="0.01" placeholder="0.00">
       </div>
       <button id="saveBudget">Save</button>
     </div>
     <div class="stats">
       <div class="stat">
-        <div class="label">Budget</div>
-        <div class="value" id="statBudget">—</div>
+        <div class="label">Budget + Income</div>
+        <div class="value" id="statBudget">&mdash;</div>
+      </div>
+      <div class="stat">
+        <div class="label">Income</div>
+        <div class="value" id="statIncome">&mdash;</div>
       </div>
       <div class="stat">
         <div class="label">Spent</div>
-        <div class="value" id="statSpent">—</div>
+        <div class="value" id="statSpent">&mdash;</div>
       </div>
       <div class="stat">
         <div class="label">Remaining</div>
-        <div class="value" id="statRemaining">—</div>
+        <div class="value" id="statRemaining">&mdash;</div>
       </div>
     </div>
     <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
@@ -219,122 +255,128 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBzvLrsTUciTqjOD_3h
 const $ = id => document.getElementById(id);
 
 let allExpenses = [];
+let allIncome = [];
 let budgets = {};
+let categories = [];
 
-// today as YYYY-MM-DD for the date input default
-$('date').value = new Date().toISOString().slice(0, 10);
+const todayIso = new Date().toISOString().slice(0, 10);
+$('date').value = todayIso;
+$('incomeDate').value = todayIso;
 
-// ---- helpers ----
 function fmt(n) {
   return n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
-
-// turn YYYY-MM-DD into DD/MM/YYYY for display
 function displayDate(iso) {
-  const [y, m, d] = iso.split('-');
-  return `${d}/${m}/${y}`;
+  const parts = iso.split('-');
+  return parts[2] + '/' + parts[1] + '/' + parts[0];
 }
-
-// YYYY-MM key from a YYYY-MM-DD date string
 function monthKey(iso) { return iso.slice(0, 7); }
-
-// "2026-06" -> "June 2026"
 function monthLabel(key) {
-  const [y, m] = key.split('-');
+  const parts = key.split('-');
   const names = ['January','February','March','April','May','June',
                  'July','August','September','October','November','December'];
-  return `${names[Number(m) - 1]} ${y}`;
+  return names[Number(parts[1]) - 1] + ' ' + parts[0];
 }
 
-// ---- data loading ----
-async function loadCategories() {
-  const r = await fetch(SCRIPT_URL + '?action=categories');
-  const { categories } = await r.json();
-  $('category').innerHTML = categories.map(c => `<option>${c}</option>`).join('');
+function fillCategoryDropdown() {
+  $('category').innerHTML = categories.map(function(c){ return '<option>' + c + '</option>'; }).join('');
 }
 
 async function loadAll() {
   const r = await fetch(SCRIPT_URL);
   const data = await r.json();
   allExpenses = data.expenses || [];
+  allIncome = data.income || [];
   budgets = data.budgets || {};
+  categories = data.categories || [];
+  fillCategoryDropdown();
   buildMonthList();
   render();
 }
 
-// build the month dropdown from existing expenses + current month
 function buildMonthList() {
-  const set = new Set(allExpenses.map(e => monthKey(e.date)));
+  const set = new Set(allExpenses.map(function(e){ return monthKey(e.date); }));
+  allIncome.forEach(function(i){ set.add(monthKey(i.date)); });
+  Object.keys(budgets).forEach(function(k){ set.add(k); });
   set.add(new Date().toISOString().slice(0, 7));
-  Object.keys(budgets).forEach(k => set.add(k));
-  const months = [...set].sort().reverse();
+  const months = Array.from(set).sort().reverse();
   const current = $('month').value || new Date().toISOString().slice(0, 7);
-  $('month').innerHTML = months.map(m =>
-    `<option value="${m}" ${m === current ? 'selected' : ''}>${monthLabel(m)}</option>`
-  ).join('');
+  $('month').innerHTML = months.map(function(m){
+    return '<option value="' + m + '" ' + (m === current ? 'selected' : '') + '>' + monthLabel(m) + '</option>';
+  }).join('');
 }
 
-// ---- rendering ----
 function render() {
   const month = $('month').value;
-  const monthExp = allExpenses.filter(e => monthKey(e.date) === month);
-
+  const monthExp = allExpenses.filter(function(e){ return monthKey(e.date) === month; });
+  const monthInc = allIncome.filter(function(i){ return monthKey(i.date) === month; });
   renderList(monthExp);
   renderSummary(monthExp);
-  renderBudget(month, monthExp);
+  renderBudget(month, monthExp, monthInc);
 }
 
 function renderList(exp) {
   if (!exp.length) {
-    $('list').innerHTML = `<tr><td style="color:var(--muted)">No expenses yet this month.</td></tr>`;
+    $('list').innerHTML = '<tr><td style="color:var(--muted)">No expenses yet this month.</td></tr>';
     return;
   }
-  const rows = exp.slice().reverse().map(e =>
-    `<tr><td>${displayDate(e.date)}</td><td>${e.category}</td><td>${e.note || ''}</td><td class="amt">${fmt(e.amount)}</td></tr>`
-  ).join('');
+  const rows = exp.slice().reverse().map(function(e){
+    return '<tr>' +
+       '<td>' + displayDate(e.date) + '</td>' +
+       '<td>' + e.category + '</td>' +
+       '<td>' + (e.note || '') + '</td>' +
+       '<td class="amt">' + fmt(e.amount) + '</td>' +
+       '<td style="text-align:right;"><button class="del-btn" data-id="' + e.id + '">&#10005;</button></td>' +
+     '</tr>';
+  }).join('');
   $('list').innerHTML =
-    `<tr><th>Date</th><th>Category</th><th>Note</th><th class="amt">Amount</th></tr>${rows}`;
+    '<tr><th>Date</th><th>Category</th><th>Note</th><th class="amt">Amount</th><th></th></tr>' + rows;
+  document.querySelectorAll('.del-btn').forEach(function(b){
+    b.addEventListener('click', function(){ deleteExpense(b.dataset.id); });
+  });
 }
 
 function renderSummary(exp) {
   const groups = {};
   let total = 0;
-  exp.forEach(e => { groups[e.category] = (groups[e.category] || 0) + e.amount; total += e.amount; });
+  exp.forEach(function(e){ groups[e.category] = (groups[e.category] || 0) + e.amount; total += e.amount; });
   if (!Object.keys(groups).length) {
-    $('summary').innerHTML = `<tr><td style="color:var(--muted)">Nothing to summarise yet.</td></tr>`;
+    $('summary').innerHTML = '<tr><td style="color:var(--muted)">Nothing to summarise yet.</td></tr>';
     return;
   }
   const rows = Object.entries(groups)
-    .sort((a, b) => b[1] - a[1])
-    .map(([cat, sum]) => `<tr><td>${cat}</td><td class="amt">${fmt(sum)}</td></tr>`).join('');
+    .sort(function(a, b){ return b[1] - a[1]; })
+    .map(function(entry){ return '<tr><td>' + entry[0] + '</td><td class="amt">' + fmt(entry[1]) + '</td></tr>'; }).join('');
   $('summary').innerHTML =
-    `<tr><th>Category</th><th class="amt">Total</th></tr>${rows}` +
-    `<tr class="group-total"><td>Total</td><td class="amt">${fmt(total)}</td></tr>`;
+    '<tr><th>Category</th><th class="amt">Total</th></tr>' + rows +
+    '<tr class="group-total"><td>Total</td><td class="amt">' + fmt(total) + '</td></tr>';
 }
 
-function renderBudget(month, exp) {
-  const budget = budgets[month] || 0;
-  const spent = exp.reduce((s, e) => s + e.amount, 0);
-  const remaining = budget - spent;
+function renderBudget(month, exp, inc) {
+  const base = budgets[month] || 0;
+  const income = inc.reduce(function(s, i){ return s + i.amount; }, 0);
+  const available = base + income;
+  const spent = exp.reduce(function(s, e){ return s + e.amount; }, 0);
+  const remaining = available - spent;
 
-  $('budgetInput').value = budget ? budget : '';
-  $('statBudget').textContent = budget ? '£' + fmt(budget) : '—';
-  $('statSpent').textContent = '£' + fmt(spent);
+  $('budgetInput').value = base ? base : '';
+  $('statBudget').textContent = available ? '\u00A3' + fmt(available) : '\u2014';
+  $('statIncome').textContent = '\u00A3' + fmt(income);
+  $('statSpent').textContent = '\u00A3' + fmt(spent);
 
   const remEl = $('statRemaining');
-  remEl.textContent = '£' + fmt(remaining);
+  remEl.textContent = '\u00A3' + fmt(remaining);
   remEl.className = 'value ' + (remaining < 0 ? 'bad' : 'good');
 
-  const pct = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
+  const pct = available > 0 ? Math.min((spent / available) * 100, 100) : 0;
   const fill = $('barFill');
   fill.style.width = pct + '%';
-  fill.classList.toggle('over', budget > 0 && spent > budget);
+  fill.classList.toggle('over', available > 0 && spent > available);
 }
 
-// ---- actions ----
 $('month').addEventListener('change', render);
 
-$('add').addEventListener('click', async () => {
+$('add').addEventListener('click', async function() {
   const amount = parseFloat($('amount').value);
   if (!amount) { $('msg').textContent = 'Please enter an amount.'; return; }
   $('msg').textContent = 'Saving...';
@@ -344,14 +386,11 @@ $('add').addEventListener('click', async () => {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
-        amount,
-        category: $('category').value,
-        date: $('date').value,
-        note: $('note').value
+        amount: amount, category: $('category').value, date: $('date').value, note: $('note').value
       })
     });
     $('amount').value = ''; $('note').value = '';
-    $('msg').textContent = 'Saved! ♥';
+    $('msg').textContent = 'Saved! \u2665';
     await loadAll();
   } catch (err) {
     $('msg').textContent = 'Error saving.';
@@ -359,7 +398,69 @@ $('add').addEventListener('click', async () => {
   $('add').disabled = false;
 });
 
-$('saveBudget').addEventListener('click', async () => {
+$('addCategory').addEventListener('click', async function() {
+  const name = $('newCategory').value.trim();
+  if (!name) { $('catMsg').textContent = 'Please enter a name.'; return; }
+  $('catMsg').textContent = 'Adding...';
+  $('addCategory').disabled = true;
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'addCategory', category: name })
+    });
+    $('newCategory').value = '';
+    $('catMsg').textContent = 'Category added! \u2665';
+    if (categories.indexOf(name) === -1) categories.push(name);
+    fillCategoryDropdown();
+    $('category').value = name;
+  } catch (err) {
+    $('catMsg').textContent = 'Error adding category.';
+  }
+  $('addCategory').disabled = false;
+});
+
+$('addIncome').addEventListener('click', async function() {
+  const amount = parseFloat($('incomeAmount').value);
+  if (!amount) { $('incomeMsg').textContent = 'Please enter an amount.'; return; }
+  $('incomeMsg').textContent = 'Saving...';
+  $('addIncome').disabled = true;
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'addIncome',
+        amount: amount,
+        date: $('incomeDate').value,
+        note: $('incomeNote').value
+      })
+    });
+    $('incomeAmount').value = ''; $('incomeNote').value = '';
+    $('incomeMsg').textContent = 'Income added! \u2665';
+    await loadAll();
+  } catch (err) {
+    $('incomeMsg').textContent = 'Error saving income.';
+  }
+  $('addIncome').disabled = false;
+});
+
+async function deleteExpense(id) {
+  if (!confirm('Delete this expense?')) return;
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'deleteExpense', id: id })
+    });
+    allExpenses = allExpenses.filter(function(e){ return e.id !== id; });
+    render();
+  } catch (err) {
+    alert('Error deleting expense.');
+  }
+}
+
+$('saveBudget').addEventListener('click', async function() {
   const budget = parseFloat($('budgetInput').value);
   if (isNaN(budget)) { $('budgetMsg').textContent = 'Please enter a budget amount.'; return; }
   const month = $('month').value;
@@ -369,10 +470,10 @@ $('saveBudget').addEventListener('click', async () => {
     await fetch(SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'setBudget', month, budget })
+      body: JSON.stringify({ action: 'setBudget', month: month, budget: budget })
     });
     budgets[month] = budget;
-    $('budgetMsg').textContent = 'Budget saved! ♥';
+    $('budgetMsg').textContent = 'Budget saved! \u2665';
     render();
   } catch (err) {
     $('budgetMsg').textContent = 'Error saving budget.';
@@ -380,8 +481,6 @@ $('saveBudget').addEventListener('click', async () => {
   $('saveBudget').disabled = false;
 });
 
-// ---- init ----
-loadCategories();
 loadAll();
 </script>
 </body>
