@@ -16,6 +16,7 @@
     --line: #ffd9e8;
     --good: #4caf82;
     --bad: #e8617f;
+    --input-bg: #ffffff;
   }
   html[data-theme="dark"] {
     --bg: #1a1119;
@@ -28,6 +29,7 @@
     --line: #4a3340;
     --good: #6fd6a6;
     --bad: #ff7d97;
+    --input-bg: #20131d;
   }
   * { box-sizing: border-box; }
   body {
@@ -61,7 +63,7 @@
     box-shadow: none;
     border-radius: 99px;
   }
-  .theme-toggle:hover { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+  .theme-toggle:hover { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
   .card {
     background: var(--card);
     border-radius: 20px;
@@ -89,7 +91,7 @@
     padding: .65rem .8rem;
     border-radius: 12px;
     border: 1.5px solid var(--line);
-    background: var(--card);
+    background: var(--input-bg);
     color: var(--text);
     width: 100%;
     font-family: inherit;
@@ -123,14 +125,15 @@
   table { width: 100%; border-collapse: collapse; font-size: .92rem; }
   th, td { text-align: left; padding: .6rem .5rem; border-bottom: 1px solid var(--line); }
   th { color: var(--muted); font-weight: 700; }
-  .amt { text-align: right; font-variant-numeric: tabular-nums; }
+  .amt { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td:first-child { white-space: nowrap; }
   .group-total td { font-weight: 700; color: var(--accent-dark); border-bottom: none; }
 
   .del-btn {
     width: auto;
     padding: .25rem .55rem;
     font-size: .8rem;
-    background: var(--card);
+    background: var(--input-bg);
     color: var(--bad);
     border: 1.5px solid var(--line);
     box-shadow: none;
@@ -167,9 +170,17 @@
   .legend .lg-amt { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--muted); }
   .chart-empty { color: var(--muted); font-size: .85rem; padding: 2rem 0; }
 
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
   @media (max-width: 560px) {
+    body { padding: .75rem; }
+    .card { padding: 1rem; border-radius: 16px; }
     .stats { grid-template-columns: 1fr 1fr; }
     .charts { grid-template-columns: 1fr; }
+    table { font-size: .82rem; }
+    th, td { padding: .45rem .35rem; }
+    .del-btn { padding: .2rem .4rem; }
+    h1 { font-size: 1.4rem; }
   }
 </style>
 </head>
@@ -281,7 +292,7 @@
 
   <div class="card">
     <h2>By Category</h2>
-    <table id="summary"></table>
+    <div class="table-scroll"><table id="summary"></table></div>
   </div>
 
   <div class="card">
@@ -300,7 +311,7 @@
 
   <div class="card">
     <h2>Expenses This Month</h2>
-    <table id="list"></table>
+    <div class="table-scroll"><table id="list"></table></div>
   </div>
 </div>
 
@@ -332,7 +343,6 @@ function applyTheme(theme) {
   themePref = theme;
   setCookie('theme', theme);
 }
-// Saved choice wins; otherwise follow the system preference.
 let themePref = getCookie('theme') ||
   ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
 applyTheme(themePref);
@@ -344,10 +354,11 @@ function fmt(n) {
   return n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function displayDate(iso) {
-  const parts = iso.split('-');
+  const datePart = String(iso).slice(0, 10); // strip any time portion
+  const parts = datePart.split('-');
   return parts[2] + '/' + parts[1] + '/' + parts[0];
 }
-function monthKey(iso) { return iso.slice(0, 7); }
+function monthKey(iso) { return String(iso).slice(0, 7); }
 function monthLabel(key) {
   const parts = key.split('-');
   const names = ['January','February','March','April','May','June',
@@ -377,7 +388,6 @@ function donutSVG(segments) {
     const end = angle + frac * 2 * Math.PI;
     const large = frac > 0.5 ? 1 : 0;
 
-    // Full circle edge case (one segment = 100%)
     if (frac >= 0.9999) {
       paths += '<circle cx="' + cx + '" cy="' + cy + '" r="' + ((r + inner) / 2) +
                '" fill="none" stroke="' + seg.color + '" stroke-width="' + (r - inner) + '"/>';
@@ -412,7 +422,6 @@ function legendHTML(segments) {
 }
 
 function renderCharts(exp, available, spent) {
-  // Category chart
   const groups = {};
   exp.forEach(function(e){ groups[e.category] = (groups[e.category] || 0) + e.amount; });
   const catSegs = Object.entries(groups)
@@ -427,7 +436,6 @@ function renderCharts(exp, available, spent) {
     $('catChart').innerHTML = '<p class="chart-empty">No expenses yet this month.</p>';
   }
 
-  // Budget chart: spent vs remaining
   const remaining = Math.max(available - spent, 0);
   if (available > 0) {
     const budgetSegs = [
