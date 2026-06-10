@@ -17,6 +17,18 @@
     --good: #4caf82;
     --bad: #e8617f;
   }
+  html[data-theme="dark"] {
+    --bg: #1a1119;
+    --bg2: #241622;
+    --card: #2a1a26;
+    --accent: #ff7fb6;
+    --accent-dark: #ff9ec9;
+    --text: #f3dde8;
+    --muted: #c79bb2;
+    --line: #4a3340;
+    --good: #6fd6a6;
+    --bad: #ff7d97;
+  }
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -26,6 +38,7 @@
     color: var(--text);
     padding: 1.5rem;
     min-height: 100vh;
+    transition: color .3s;
   }
   h1 {
     font-weight: 700;
@@ -37,6 +50,18 @@
   h1::before { content: "\2740 "; }
   h1::after { content: " \2740"; }
   .wrap { max-width: 780px; margin: 0 auto; }
+  .topbar { display: flex; justify-content: flex-end; max-width: 780px; margin: 0 auto .5rem; }
+  .theme-toggle {
+    width: auto;
+    padding: .45rem .9rem;
+    font-size: .85rem;
+    background: var(--card);
+    color: var(--accent-dark);
+    border: 1.5px solid var(--line);
+    box-shadow: none;
+    border-radius: 99px;
+  }
+  .theme-toggle:hover { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
   .card {
     background: var(--card);
     border-radius: 20px;
@@ -44,6 +69,7 @@
     margin-bottom: 1.4rem;
     box-shadow: 0 6px 20px rgba(255,127,182,.18);
     border: 1px solid var(--line);
+    transition: background .3s, border-color .3s;
   }
   h2 {
     margin-top: 0;
@@ -63,7 +89,7 @@
     padding: .65rem .8rem;
     border-radius: 12px;
     border: 1.5px solid var(--line);
-    background: #fff;
+    background: var(--card);
     color: var(--text);
     width: 100%;
     font-family: inherit;
@@ -88,7 +114,7 @@
   button:active { transform: translateY(0); }
   button:disabled { opacity: .6; cursor: default; transform: none; }
   .btn-secondary {
-    background: #fff;
+    background: var(--card);
     color: var(--accent-dark);
     border: 1.5px solid var(--accent);
     box-shadow: none;
@@ -104,13 +130,13 @@
     width: auto;
     padding: .25rem .55rem;
     font-size: .8rem;
-    background: #fff;
+    background: var(--card);
     color: var(--bad);
     border: 1.5px solid var(--line);
     box-shadow: none;
     border-radius: 8px;
   }
-  .del-btn:hover { background: #ffeef2; border-color: var(--bad); transform: none; box-shadow: none; }
+  .del-btn:hover { background: var(--bg); border-color: var(--bad); transform: none; box-shadow: none; }
 
   .month-bar { display: flex; align-items: center; gap: .75rem; justify-content: center; }
   .month-bar select { width: auto; min-width: 180px; font-weight: 600; }
@@ -148,6 +174,9 @@
 </style>
 </head>
 <body>
+<div class="topbar">
+  <button id="themeToggle" class="theme-toggle">&#127769; Dark mode</button>
+</div>
 <div class="wrap">
   <h1>Roseemew Budget Tracker</h1>
 
@@ -288,6 +317,28 @@ let categories = [];
 const todayIso = new Date().toISOString().slice(0, 10);
 $('date').value = todayIso;
 $('incomeDate').value = todayIso;
+
+// ---- Dark mode ----
+function setCookie(name, value) {
+  document.cookie = name + '=' + value + ';path=/;max-age=' + (60 * 60 * 24 * 365);
+}
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return match ? match[1] : null;
+}
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  $('themeToggle').innerHTML = theme === 'dark' ? '\u2600\uFE0F Light mode' : '\uD83C\uDF19 Dark mode';
+  themePref = theme;
+  setCookie('theme', theme);
+}
+// Saved choice wins; otherwise follow the system preference.
+let themePref = getCookie('theme') ||
+  ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
+applyTheme(themePref);
+$('themeToggle').addEventListener('click', function() {
+  applyTheme(themePref === 'dark' ? 'light' : 'dark');
+});
 
 function fmt(n) {
   return n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
