@@ -1,890 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="theme-color" content="#FFD100"/>
-  <title>BEE.NET</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --y:      #FFD100;
-      --y2:     #FFE84D;
-      --bg:     #0C0C0C;
-      --panel:  #131313;
-      --panel2: #1A1A1A;
-      --border: #2A2A2A;
-      --border2:#383838;
-      --green:  #39FF14;
-      --red:    #FF2D55;
-      --blue:   #00E5FF;
-      --white:  #F0ECD8;
-      --dim:    #555;
-      --dim2:   #888;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    html, body {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--white);
-      font-family: 'Share Tech Mono', monospace;
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      inset: 0;
-    }
-
-    /* CRT scanlines — subtle on mobile */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px, transparent 2px,
-        rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 3px
-      );
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    /* ══════════════════════════════════
-       TOP BAR
-    ══════════════════════════════════ */
-    #topbar {
-      flex-shrink: 0;
-      background: var(--y);
-      padding: env(safe-area-inset-top, 0) 0 0;
-      position: relative;
-      z-index: 100;
-    }
-
-    .tb-inner {
-      display: flex;
-      align-items: center;
-      padding: 10px 14px;
-      gap: 10px;
-    }
-
-    /* pixel bee mark */
-    .bee-mark {
-      flex-shrink: 0;
-      width: 36px;
-      height: 36px;
-    }
-
-    .tb-titles {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .tb-title {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.75rem;
-      color: var(--bg);
-      line-height: 1;
-      letter-spacing: -0.02em;
-    }
-
-    .tb-sub {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.32rem;
-      color: rgba(0,0,0,0.5);
-      margin-top: 5px;
-      letter-spacing: 0.04em;
-    }
-
-    /* Refresh button in topbar */
-    .tb-refresh {
-      flex-shrink: 0;
-      width: 38px;
-      height: 38px;
-      background: var(--bg);
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: var(--y);
-      font-size: 1.1rem;
-      box-shadow:
-        inset -1px -1px 0 #000,
-        inset 1px 1px 0 rgba(255,255,255,0.1);
-      transition: opacity 0.1s;
-      -webkit-user-select: none;
-    }
-    .tb-refresh:active { opacity: 0.6; }
-    .tb-refresh:disabled { opacity: 0.3; }
-
-    /* Marquee strip */
-    .marquee-strip {
-      background: var(--bg);
-      border-top: 1px solid rgba(0,0,0,0.3);
-      padding: 4px 0;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-    .marquee-inner {
-      display: inline-block;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.38rem;
-      color: var(--y);
-      animation: marq 30s linear infinite;
-    }
-    @keyframes marq {
-      from { transform: translateX(100vw); }
-      to   { transform: translateX(-100%); }
-    }
-
-    /* ══════════════════════════════════
-       SEARCH BAR
-    ══════════════════════════════════ */
-    #search-bar {
-      flex-shrink: 0;
-      background: var(--panel);
-      border-bottom: 2px solid var(--y);
-      padding: 10px 14px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      position: relative;
-      z-index: 50;
-    }
-
-    .search-label {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.4rem;
-      color: var(--dim2);
-      white-space: nowrap;
-    }
-
-    #postcode-input {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border2);
-      color: var(--white);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.65rem;
-      padding: 11px 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      outline: none;
-      -webkit-appearance: none;
-      border-radius: 0;
-      caret-color: var(--y);
-      transition: border-color 0.15s;
-    }
-    #postcode-input:focus {
-      border-color: var(--y);
-      box-shadow: 0 0 0 1px var(--y);
-    }
-    #postcode-input::placeholder {
-      color: var(--dim);
-      font-size: 0.55rem;
-    }
-
-    .search-go {
-      background: var(--y);
-      color: var(--bg);
-      border: none;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.5rem;
-      padding: 11px 12px;
-      cursor: pointer;
-      white-space: nowrap;
-      min-height: 44px;
-      box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
-      transition: transform 0.08s, box-shadow 0.08s;
-      -webkit-user-select: none;
-    }
-    .search-go:active {
-      transform: translate(2px, 2px);
-      box-shadow: none;
-    }
-
-    .gps-btn {
-      background: var(--panel2);
-      border: 1px solid var(--border2);
-      color: var(--y);
-      padding: 0;
-      width: 44px;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1.1rem;
-      transition: background 0.1s;
-      -webkit-user-select: none;
-    }
-    .gps-btn:active { background: var(--border); }
-    .gps-btn.active { background: rgba(255,209,0,0.12); border-color: var(--y); }
-
-    /* ══════════════════════════════════
-       STATUS LINE
-    ══════════════════════════════════ */
-    #status-line {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .led {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--dim);
-      flex-shrink: 0;
-      transition: background 0.3s, box-shadow 0.3s;
-    }
-    .led.green  { background: var(--green); box-shadow: 0 0 8px var(--green); }
-    .led.yellow { background: var(--y);     box-shadow: 0 0 8px var(--y); }
-    .led.red    { background: var(--red);   box-shadow: 0 0 8px var(--red); }
-
-    #status-msg {
-      font-family: 'VT323', monospace;
-      font-size: 1rem;
-      color: var(--green);
-      letter-spacing: 0.04em;
-      flex: 1;
-    }
-
-    #clock {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--dim);
-    }
-
-    /* ══════════════════════════════════
-       SCROLL AREA
-    ══════════════════════════════════ */
-    #scroll-area {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-      padding: 12px 12px 80px;
-      background: var(--bg);
-    }
-
-    /* ══════════════════════════════════
-       ERROR BANNER
-    ══════════════════════════════════ */
-    .err-box {
-      display: none;
-      background: rgba(255,45,85,0.1);
-      border: 1px solid var(--red);
-      padding: 10px 12px;
-      margin-bottom: 12px;
-      font-family: 'VT323', monospace;
-      font-size: 1rem;
-      color: #ff9aae;
-    }
-    .err-box::before {
-      content: 'ERR ► ';
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.42rem;
-      color: var(--red);
-    }
-
-    /* ══════════════════════════════════
-       STOP WINDOW CARD
-    ══════════════════════════════════ */
-    .stop-win {
-      background: var(--panel);
-      border: 1px solid var(--y);
-      margin-bottom: 14px;
-      box-shadow:
-        3px 3px 0 rgba(255,209,0,0.18),
-        0 0 16px rgba(255,209,0,0.06);
-    }
-
-    /* Window chrome bar */
-    .win-chrome {
-      background: var(--y);
-      padding: 7px 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .win-dots { display: flex; gap: 4px; }
-    .wd { width: 9px; height: 9px; border-radius: 50%; }
-    .wd.r { background: var(--red); }
-    .wd.y { background: var(--y2); }
-    .wd.g { background: var(--green); }
-
-    .win-stop-name {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.45rem;
-      color: var(--bg);
-      flex: 1;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      letter-spacing: 0.02em;
-    }
-
-    .win-dist {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem;
-      background: var(--bg);
-      color: var(--y);
-      padding: 2px 7px;
-      border: 1px solid var(--y);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    /* ATCO sub-row */
-    .win-atco {
-      background: rgba(0,229,255,0.04);
-      border-bottom: 1px solid var(--border);
-      padding: 5px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .atco-lbl {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.32rem;
-      color: var(--dim);
-    }
-    .atco-val {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--blue);
-      letter-spacing: 0.1em;
-    }
-
-    /* ══════════════════════════════════
-       DEPARTURE ROWS
-    ══════════════════════════════════ */
-    .dep-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 12px;
-      border-bottom: 1px solid var(--border);
-      min-height: 56px;
-    }
-    .dep-row:last-child { border-bottom: none; }
-
-    .dep-badge {
-      background: var(--y);
-      color: var(--bg);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.55rem;
-      padding: 6px 6px;
-      min-width: 46px;
-      text-align: center;
-      flex-shrink: 0;
-      box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 60px;
-    }
-
-    .dep-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .dep-dest {
-      font-family: 'VT323', monospace;
-      font-size: 1.35rem;
-      color: var(--white);
-      line-height: 1.05;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .dep-op {
-      font-size: 0.65rem;
-      color: var(--dim2);
-      margin-top: 1px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .dep-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-      flex-shrink: 0;
-    }
-
-    .dep-time {
-      font-family: 'VT323', monospace;
-      font-size: 1.7rem;
-      color: var(--y);
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    .dep-time.due {
-      color: var(--green);
-      animation: blink 0.9s step-end infinite;
-    }
-
-    .dep-status {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.33rem;
-      padding: 3px 5px;
-      white-space: nowrap;
-    }
-    .dep-status.live  { background: rgba(57,255,20,0.12); color: var(--green); border: 1px solid rgba(57,255,20,0.5); }
-    .dep-status.sched { background: rgba(0,229,255,0.07); color: var(--blue);  border: 1px solid rgba(0,229,255,0.3); }
-    .dep-status.due   { background: rgba(255,209,0,0.12); color: var(--y);     border: 1px solid var(--y); animation: blink 0.9s step-end infinite; }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
-    }
-
-    /* ══════════════════════════════════
-       SKELETON
-    ══════════════════════════════════ */
-    @keyframes pulse { 0%,100%{opacity:.25} 50%{opacity:.55} }
-    .sk { background: var(--border2); animation: pulse 1.5s ease infinite; display: inline-block; }
-
-    .sk-dep-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 12px;
-      border-bottom: 1px solid var(--border);
-      min-height: 56px;
-    }
-
-    /* ══════════════════════════════════
-       EMPTY / NO DEPS
-    ══════════════════════════════════ */
-    .no-deps {
-      padding: 22px 12px;
-      text-align: center;
-      font-family: 'VT323', monospace;
-      font-size: 1.1rem;
-      color: var(--dim2);
-    }
-
-    /* ══════════════════════════════════
-       BOTTOM NAV BAR
-    ══════════════════════════════════ */
-    #bottom-bar {
-      flex-shrink: 0;
-      background: var(--y);
-      border-top: 2px solid var(--bg);
-      padding: 4px 14px calc(4px + env(safe-area-inset-bottom, 0));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.35rem;
-      color: var(--bg);
-      gap: 6px;
-    }
-
-    .bb-seg { display: flex; align-items: center; gap: 5px; }
-    .bb-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--bg); opacity: 0.35; }
-    .bb-dot.on { opacity: 1; animation: blink 1.5s step-end infinite; }
-    .bb-div { width: 1px; height: 10px; background: rgba(0,0,0,0.2); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Tracker</title>
+<style>
+  :root { --bg:#0f1115; --card:#1a1d24; --accent:#5b8def; --text:#e6e8eb; --muted:#8b909a; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, sans-serif; background:var(--bg); color:var(--text); padding:1.5rem; }
+  h1 { font-weight:600; }
+  .wrap { max-width:780px; margin:0 auto; }
+  .card { background:var(--card); border-radius:12px; padding:1.25rem; margin-bottom:1.25rem; }
+  label { display:block; font-size:.85rem; color:var(--muted); margin-bottom:.25rem; }
+  input, select, button { font-size:1rem; padding:.6rem .7rem; border-radius:8px; border:1px solid #2a2e38; background:#12141a; color:var(--text); width:100%; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-bottom:.75rem; }
+  button { background:var(--accent); border:none; cursor:pointer; font-weight:600; }
+  button:hover { opacity:.9; }
+  table { width:100%; border-collapse:collapse; font-size:.9rem; }
+  th, td { text-align:left; padding:.5rem; border-bottom:1px solid #2a2e38; }
+  th { color:var(--muted); font-weight:500; }
+  .amt { text-align:right; font-variant-numeric:tabular-nums; }
+  .group-total { font-weight:600; color:var(--accent); }
+  .msg { font-size:.85rem; color:var(--muted); min-height:1rem; }
+</style>
 </head>
 <body>
+<div class="wrap">
+  <h1>Budget Tracker</h1>
 
-<!-- ══ TOP BAR ══ -->
-<div id="topbar">
-  <div class="tb-inner">
-    <!-- pixel bee -->
-    <svg class="bee-mark" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <rect x="5" y="7" width="6" height="7" fill="#111"/>
-      <rect x="5" y="7" width="6" height="7" fill="#FFD100" opacity="0.95"/>
-      <rect x="5" y="9" width="6" height="2" fill="#111"/>
-      <rect x="5" y="12" width="6" height="1" fill="#111"/>
-      <rect x="6" y="5" width="4" height="3" fill="#FFD100"/>
-      <rect x="6" y="3" width="1" height="2" fill="#111"/>
-      <rect x="9" y="3" width="1" height="2" fill="#111"/>
-      <rect x="5" y="2" width="2" height="1" fill="#111"/>
-      <rect x="9" y="2" width="2" height="1" fill="#111"/>
-      <rect x="1" y="6" width="4" height="3" fill="white" opacity="0.85"/>
-      <rect x="11" y="6" width="4" height="3" fill="white" opacity="0.85"/>
-      <rect x="6" y="6" width="1" height="1" fill="#111"/>
-      <rect x="9" y="6" width="1" height="1" fill="#111"/>
-    </svg>
-    <div class="tb-titles">
-      <div class="tb-title">BEE.NET</div>
-      <div class="tb-sub">LIVE DEPARTURES // GREATER MANCHESTER</div>
+  <div class="card">
+    <div class="row">
+      <div>
+        <label>Amount</label>
+        <input type="number" id="amount" step="0.01" placeholder="0.00">
+      </div>
+      <div>
+        <label>Category</label>
+        <select id="category"></select>
+      </div>
     </div>
-    <button class="tb-refresh" id="refresh-btn" onclick="doRefresh()" aria-label="Refresh" title="Refresh">
-      ↻
-    </button>
-  </div>
-  <div class="marquee-strip" aria-hidden="true">
-    <span class="marquee-inner">★ BEE NETWORK ★ LIVE BUS DEPARTURES ★ GREATER MANCHESTER ★ ENTER POSTCODE OR USE GPS ★ AUTO-REFRESH EVERY 60s ★ BEE NETWORK ★ LIVE BUS DEPARTURES ★ GREATER MANCHESTER ★</span>
-  </div>
-</div>
-
-<!-- ══ SEARCH BAR ══ -->
-<div id="search-bar">
-  <input
-    id="postcode-input"
-    type="text"
-    inputmode="text"
-    placeholder="M1 1AE"
-    maxlength="8"
-    autocomplete="off"
-    autocorrect="off"
-    autocapitalize="characters"
-    spellcheck="false"
-    aria-label="Postcode"
-  />
-  <button class="search-go" onclick="searchPostcode()" aria-label="Search postcode">GO</button>
-  <button class="gps-btn" id="gps-btn" onclick="useGPS()" aria-label="Use my location" title="Use GPS">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" stroke-width="0"/><circle cx="12" cy="12" r="7" stroke-dasharray="3 3"/></svg>
-  </button>
-</div>
-
-<!-- ══ STATUS LINE ══ -->
-<div id="status-line">
-  <div class="led" id="led"></div>
-  <span id="status-msg">READY.</span>
-  <span id="clock"></span>
-</div>
-
-<!-- ══ SCROLL AREA ══ -->
-<div id="scroll-area">
-  <div class="err-box" id="err-box"></div>
-  <div id="stops-container">
-    <div style="text-align:center; padding:60px 20px; font-family:'VT323',monospace; font-size:1.1rem; color:var(--dim2); line-height:2;">
-      ENTER A POSTCODE ABOVE<br>OR TAP THE GPS BUTTON<br>TO FIND NEARBY BUSES
+    <div class="row">
+      <div>
+        <label>Date</label>
+        <input type="date" id="date">
+      </div>
+      <div>
+        <label>Note (optional)</label>
+        <input type="text" id="note" placeholder="...">
+      </div>
     </div>
+    <button id="add">Add Expense</button>
+    <p class="msg" id="msg"></p>
   </div>
-</div>
 
-<!-- ══ BOTTOM BAR ══ -->
-<div id="bottom-bar" aria-hidden="true">
-  <div class="bb-seg">
-    <div class="bb-dot on" id="bb-dot"></div>
-    <span id="bb-status">READY</span>
+  <div class="card">
+    <h2 style="margin-top:0;font-size:1.1rem;">By Category</h2>
+    <table id="summary"></table>
   </div>
-  <div class="bb-div"></div>
-  <div class="bb-seg"><span>TRANSPORTAPI</span></div>
-  <div class="bb-div"></div>
-  <div class="bb-seg"><span>© TFGM / BEE NETWORK</span></div>
-  <div class="bb-div" style="margin-left:auto"></div>
-  <div class="bb-seg"><span id="bb-clock">--:--</span></div>
+
+  <div class="card">
+    <h2 style="margin-top:0;font-size:1.1rem;">All Expenses</h2>
+    <table id="list"></table>
+  </div>
 </div>
 
 <script>
-  const APP_ID  = '2d9de197';
-  const APP_KEY = '62a9bae30dd15ebaf5ea0da18150ca44';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnMvVznvP-_WEdf5WX6GukNcRF_rlQJLQbTtd7SKBnTGuV6i_gQhiVsvv9enyuknqRaw/exec';
 
-  let lastLat = null, lastLon = null, autoTimer = null;
+const $ = id => document.getElementById(id);
+$('date').value = new Date().toISOString().slice(0, 10);
 
-  /* ── CLOCK ── */
-  function tick() {
-    const t = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('clock').textContent = t;
-    document.getElementById('bb-clock').textContent = t;
-  }
-  tick();
-  setInterval(tick, 10000);
+async function loadCategories() {
+  const r = await fetch(SCRIPT_URL + '?action=categories');
+  const { categories } = await r.json();
+  $('category').innerHTML = categories.map(c => `<option>${c}</option>`).join('');
+}
 
-  /* ── INPUT: ENTER KEY ── */
-  document.getElementById('postcode-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); searchPostcode(); }
-  });
+async function loadExpenses() {
+  const r = await fetch(SCRIPT_URL);
+  const { expenses } = await r.json();
+  renderList(expenses);
+  renderSummary(expenses);
+}
 
-  /* ── STATUS ── */
-  function setStatus(type, msg) {
-    document.getElementById('led').className = 'led ' + (type || '');
-    document.getElementById('status-msg').textContent = msg;
-    const bb = msg.length > 18 ? msg.slice(0, 18) + '…' : msg;
-    document.getElementById('bb-status').textContent = bb;
-    document.getElementById('bb-dot').className = 'bb-dot' + (type === 'green' ? ' on' : '');
-  }
+function fmt(n) { return n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
 
-  function showErr(msg) {
-    const el = document.getElementById('err-box');
-    el.textContent = msg;
-    el.style.display = 'block';
-    document.getElementById('scroll-area').scrollTop = 0;
-    setTimeout(() => el.style.display = 'none', 8000);
-  }
+function renderList(exp) {
+  const rows = exp.slice().reverse().map(e =>
+    `<tr><td>${e.date}</td><td>${e.category}</td><td>${e.note||''}</td><td class="amt">${fmt(e.amount)}</td></tr>`
+  ).join('');
+  $('list').innerHTML = `<tr><th>Date</th><th>Category</th><th>Note</th><th class="amt">Amount</th></tr>${rows}`;
+}
 
-  /* ── GPS ── */
-  function useGPS() {
-    const btn = document.getElementById('gps-btn');
-    btn.classList.add('active');
-    document.getElementById('postcode-input').value = '';
-    clearAuto();
-    setStatus('yellow', 'LOCATING...');
-    renderSkeletons();
+function renderSummary(exp) {
+  const groups = {};
+  let total = 0;
+  exp.forEach(e => { groups[e.category] = (groups[e.category]||0) + e.amount; total += e.amount; });
+  const rows = Object.entries(groups)
+    .sort((a,b) => b[1]-a[1])
+    .map(([cat,sum]) => `<tr><td>${cat}</td><td class="amt">${fmt(sum)}</td></tr>`).join('');
+  $('summary').innerHTML =
+    `<tr><th>Category</th><th class="amt">Total</th></tr>${rows}` +
+    `<tr class="group-total"><td>Total</td><td class="amt">${fmt(total)}</td></tr>`;
+}
 
-    if (!navigator.geolocation) {
-      setStatus('red', 'GPS NOT SUPPORTED');
-      btn.classList.remove('active');
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        btn.classList.remove('active');
-        lastLat = pos.coords.latitude;
-        lastLon = pos.coords.longitude;
-        fetchStops(lastLat, lastLon, 'GPS LOCATION');
-        startAuto();
-      },
-      () => {
-        btn.classList.remove('active');
-        setStatus('red', 'LOCATION DENIED');
-        showErr('Location access denied. Allow location access in your browser settings.');
-      },
-      { enableHighAccuracy: true, timeout: 12000 }
-    );
-  }
-
-  /* ── POSTCODE SEARCH ── */
-  async function searchPostcode() {
-    const raw = document.getElementById('postcode-input').value.trim().toUpperCase().replace(/\s+/g, '');
-    if (!raw) { showErr('ENTER A POSTCODE FIRST'); return; }
-    clearAuto();
-    setStatus('yellow', 'LOOKING UP ' + raw + '...');
-    renderSkeletons();
-
-    try {
-      const r = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(raw)}`);
-      const d = await r.json();
-      if (!r.ok || d.status !== 200) throw new Error('POSTCODE NOT FOUND: ' + raw);
-      lastLat = d.result.latitude;
-      lastLon = d.result.longitude;
-      fetchStops(lastLat, lastLon, raw);
-      startAuto();
-    } catch (e) {
-      setStatus('red', 'POSTCODE ERROR');
-      showErr(e.message || 'Could not look up that postcode.');
-    }
-  }
-
-  /* ── AUTO REFRESH ── */
-  function startAuto() {
-    clearAuto();
-    autoTimer = setInterval(() => {
-      if (lastLat !== null) fetchStops(lastLat, lastLon);
-    }, 60000);
-  }
-  function clearAuto() { clearInterval(autoTimer); }
-
-  /* ── MANUAL REFRESH ── */
-  function doRefresh() {
-    if (lastLat === null) {
-      document.getElementById('postcode-input').focus();
-      return;
-    }
-    fetchStops(lastLat, lastLon);
-  }
-
-  /* ── MAIN FETCH FLOW ── */
-  async function fetchStops(lat, lon, label) {
-    const btn = document.getElementById('refresh-btn');
-    btn.disabled = true;
-    document.getElementById('err-box').style.display = 'none';
-    if (label) setStatus('yellow', 'SCANNING ' + label + '...');
-    else       setStatus('yellow', 'REFRESHING...');
-
-    try {
-      const stops = await nearbyStops(lat, lon);
-      if (!stops.length) {
-        setStatus('red', 'NO STOPS FOUND');
-        document.getElementById('stops-container').innerHTML =
-          '<div class="no-deps">NO BUS STOPS FOUND<br>WITHIN 800M</div>';
-        return;
-      }
-      setStatus('yellow', 'FETCHING DEPARTURES...');
-      const results = await Promise.all(stops.slice(0, 2).map(s => getDeps(s)));
-      renderAll(results);
-      setStatus('green', 'LIVE ✓');
-    } catch (e) {
-      console.error(e);
-      setStatus('red', 'ERROR');
-      showErr(e.message || 'Unexpected error. Try again.');
-    } finally {
-      btn.disabled = false;
-    }
-  }
-
-  /* ── OVERPASS ── */
-  async function nearbyStops(lat, lon, radius = 800) {
-    const q = `[out:json][timeout:15];node[highway=bus_stop](around:${radius},${lat},${lon});out body;`;
-    const r = await fetch('https://overpass-api.de/api/interpreter', {
-      method: 'POST', body: q,
-      headers: { 'Content-Type': 'text/plain' }
-    });
-    if (!r.ok) throw new Error('OVERPASS API UNREACHABLE');
-    const d = await r.json();
-    return (d.elements || [])
-      .map(n => {
-        const atco = n.tags?.['naptan:AtcoCode'] || n.tags?.['ref'];
-        if (!atco || !/^\d{4}[A-Z]{2,3}\d+/.test(atco)) return null;
-        return {
-          atco,
-          name: n.tags?.name || n.tags?.['naptan:CommonName'] || 'BUS STOP',
-          lat: n.lat, lon: n.lon,
-          dist: haversine(lat, lon, n.lat, n.lon)
-        };
+$('add').addEventListener('click', async () => {
+  const amount = parseFloat($('amount').value);
+  if (!amount) { $('msg').textContent = 'Enter an amount.'; return; }
+  $('msg').textContent = 'Saving...';
+  $('add').disabled = true;
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        amount,
+        category: $('category').value,
+        date: $('date').value,
+        note: $('note').value
       })
-      .filter(Boolean)
-      .sort((a, b) => a.dist - b.dist);
-  }
-
-  /* ── TRANSPORTAPI ── */
-  async function getDeps(stop) {
-    const url = `https://transportapi.com/v3/uk/bus/stop/${encodeURIComponent(stop.atco)}/live.json`
-      + `?app_id=${APP_ID}&app_key=${APP_KEY}&group=no&nextbuses=no&limit=8`;
-    const r = await fetch(url);
-    if (r.status === 401 || r.status === 403) throw new Error('TRANSPORTAPI AUTH FAILED');
-    if (!r.ok) return { stop, deps: [] };
-    const data = await r.json();
-    const deps = [];
-    if (data.departures) {
-      for (const line of Object.keys(data.departures))
-        for (const d of data.departures[line]) deps.push({ ...d, line_name: line });
-    }
-    deps.sort((a, b) => minsAway(a) - minsAway(b));
-    return { stop, deps: deps.slice(0, 7) };
-  }
-
-  /* ── RENDER ── */
-  function renderAll(results) {
-    const c = document.getElementById('stops-container');
-    c.innerHTML = '';
-    results.forEach(({ stop, deps }) => {
-      const dist = stop.dist < 1000
-        ? Math.round(stop.dist) + 'M'
-        : (stop.dist / 1000).toFixed(1) + 'KM';
-      const win = document.createElement('div');
-      win.className = 'stop-win';
-      win.innerHTML = `
-        <div class="win-chrome">
-          <div class="win-dots" aria-hidden="true">
-            <div class="wd r"></div><div class="wd y"></div><div class="wd g"></div>
-          </div>
-          <div class="win-stop-name">${esc(stop.name.toUpperCase())}</div>
-          <div class="win-dist">${dist}</div>
-        </div>
-        <div class="win-atco">
-          <span class="atco-lbl">ATCO</span>
-          <span class="atco-val">${esc(stop.atco)}</span>
-        </div>
-        ${renderDeps(deps)}
-      `;
-      c.appendChild(win);
     });
-    document.getElementById('scroll-area').scrollTop = 0;
+    $('amount').value = ''; $('note').value = '';
+    $('msg').textContent = 'Saved.';
+    await loadExpenses();
+  } catch (err) {
+    $('msg').textContent = 'Error saving.';
   }
+  $('add').disabled = false;
+});
 
-  function renderDeps(deps) {
-    if (!deps.length) return '<div class="no-deps">[ NO DEPARTURES FOUND ]</div>';
-    return deps.map(dep => {
-      const route = esc(dep.line_name || dep.line || '?');
-      const dest  = esc((dep.direction || dep.direction_name || dep.destination_name || 'UNKNOWN').toUpperCase());
-      const op    = esc((dep.operator_name || dep.operator || '').toUpperCase());
-      const dm    = minsAway(dep);
-      const live  = dep.source === 'Realtime';
-      const t     = dep.best_departure_estimate || dep.expected_departure_time || dep.aimed_departure_time || '--:--';
-
-      let display = t, tClass = '', sClass = 'sched', sLabel = 'SCHD';
-      if (dm !== null) {
-        if (dm <= 0)      { display = 'DUE';      tClass = 'due'; sClass = 'due';  sLabel = 'DUE'; }
-        else if (dm < 60) { display = dm + ' MIN'; }
-        if (live && dm > 0) { sClass = 'live'; sLabel = 'LIVE'; }
-        if (dm <= 1)        { sClass = 'due';  sLabel = 'DUE'; }
-      }
-
-      return `
-        <div class="dep-row">
-          <div class="dep-badge">${route}</div>
-          <div class="dep-info">
-            <div class="dep-dest">${dest}</div>
-            ${op ? `<div class="dep-op">${op}</div>` : ''}
-          </div>
-          <div class="dep-right">
-            <div class="dep-time ${tClass}">${esc(display)}</div>
-            <div class="dep-status ${sClass}">${sLabel}</div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  /* ── SKELETONS ── */
-  function renderSkeletons() {
-    const skRow = () => `
-      <div class="sk-dep-row">
-        <div class="sk" style="width:46px;height:30px;flex-shrink:0"></div>
-        <div style="flex:1;min-width:0;padding:0 10px">
-          <div class="sk" style="width:72%;height:18px;margin-bottom:5px"></div>
-          <div class="sk" style="width:42%;height:11px"></div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
-          <div class="sk" style="width:52px;height:22px"></div>
-          <div class="sk" style="width:34px;height:11px"></div>
-        </div>
-      </div>`;
-    document.getElementById('stops-container').innerHTML = [0,1].map(() => `
-      <div class="stop-win" style="margin-bottom:14px">
-        <div class="win-chrome">
-          <div class="win-dots" aria-hidden="true">
-            <div class="wd r"></div><div class="wd y"></div><div class="wd g"></div>
-          </div>
-          <div class="sk" style="flex:1;height:8px;margin:0 8px"></div>
-        </div>
-        <div class="win-atco"><div class="sk" style="width:110px;height:10px"></div></div>
-        ${[0,1,2,3,4].map(skRow).join('')}
-      </div>`).join('');
-  }
-
-  /* ── HELPERS ── */
-  function esc(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function haversine(la1, lo1, la2, lo2) {
-    const R = 6371000, r = Math.PI/180;
-    const a = Math.sin((la2-la1)*r/2)**2 + Math.cos(la1*r)*Math.cos(la2*r)*Math.sin((lo2-lo1)*r/2)**2;
-    return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-  }
-
-  function minsAway(dep) {
-    const s = dep.best_departure_estimate || dep.expected_departure_time || dep.aimed_departure_time;
-    if (!s) return null;
-    const m = s.match(/^(\d{1,2}):(\d{2})$/);
-    if (!m) return null;
-    const now = new Date();
-    let d = (parseInt(m[1])*60 + parseInt(m[2])) - (now.getHours()*60 + now.getMinutes());
-    if (d < -720) d += 1440;
-    return d;
-  }
+loadCategories();
+loadExpenses();
 </script>
 </body>
 </html>
