@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#0a0c10;color:#eef1f6;font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  ::selection{background:rgba(79,140,255,.32)}
+  input,select,button,textarea{font-family:inherit}
+  select option{background:#161a23;color:#eef1f6}
+  input::placeholder{color:#5f6776}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.09);border-radius:8px}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.16)}
+  ::-webkit-scrollbar-track{background:transparent}
+  @keyframes mwBack{from{opacity:0}to{opacity:1}}
+  @keyframes mwPanel{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+  @keyframes mwSpin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+
+<div style="display:flex;min-height:100vh;width:100%">
+
+  <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
+    <aside style="width:236px;flex:none;background:#0c0e14;border-right:1px solid rgba(255,255,255,.06);padding:24px 18px;display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100vh">
+      <div style="display:flex;align-items:center;gap:11px;padding:4px 6px">
+        <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#4f8cff,#2f5fd6);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px -6px rgba(79,140,255,.7)">
+          <div style="width:11px;height:11px;background:#fff;transform:rotate(45deg);border-radius:2px"></div>
+        </div>
+        <div style="font-weight:800;font-size:18px;letter-spacing:-.02em">Ledger</div>
+      </div>
+
+      <nav style="display:flex;flex-direction:column;gap:3px">
+        <a href="#" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:11px;text-decoration:none;color:#bfe0ff;background:rgba(79,140,255,.13);font-weight:600;font-size:14px;border:1px solid rgba(79,140,255,.18)">
+          <svg width="17" height="17" viewBox="0 0 18 18" fill="none"><rect x="1.5" y="1.5" width="6.2" height="6.2" rx="1.6" fill="currentColor"></rect><rect x="10.3" y="1.5" width="6.2" height="6.2" rx="1.6" fill="currentColor" opacity=".55"></rect><rect x="1.5" y="10.3" width="6.2" height="6.2" rx="1.6" fill="currentColor" opacity=".55"></rect><rect x="10.3" y="10.3" width="6.2" height="6.2" rx="1.6" fill="currentColor"></rect></svg>
+          Overview
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:11px;text-decoration:none;color:#8b93a7;font-weight:600;font-size:14px" style-hover="background:rgba(255,255,255,.04);color:#eef1f6">
+          <svg width="17" height="17" viewBox="0 0 18 18" fill="none"><rect x="1.6" y="3.2" width="14.8" height="2.3" rx="1.1" fill="currentColor"></rect><rect x="1.6" y="7.85" width="14.8" height="2.3" rx="1.1" fill="currentColor"></rect><rect x="1.6" y="12.5" width="9.5" height="2.3" rx="1.1" fill="currentColor"></rect></svg>
+          Transactions
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:11px;text-decoration:none;color:#8b93a7;font-weight:600;font-size:14px" style-hover="background:rgba(255,255,255,.04);color:#eef1f6">
+          <svg width="17" height="17" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.6" stroke="currentColor" stroke-width="2.2"></circle><path d="M9 2.4 A6.6 6.6 0 0 1 15.1 6.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path></svg>
+          Budgets
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:11px;text-decoration:none;color:#8b93a7;font-weight:600;font-size:14px" style-hover="background:rgba(255,255,255,.04);color:#eef1f6">
+          <svg width="17" height="17" viewBox="0 0 18 18" fill="none"><rect x="3" y="1.6" width="12" height="14.8" rx="2" stroke="currentColor" stroke-width="2"></rect><rect x="6" y="5" width="6" height="1.8" rx=".9" fill="currentColor"></rect><rect x="6" y="8.4" width="6" height="1.8" rx=".9" fill="currentColor"></rect></svg>
+          Bills
+        </a>
+        <a href="#" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:11px;text-decoration:none;color:#8b93a7;font-weight:600;font-size:14px" style-hover="background:rgba(255,255,255,.04);color:#eef1f6">
+          <svg width="17" height="17" viewBox="0 0 18 18" fill="none"><rect x="1.8" y="9.5" width="3.4" height="6.7" rx="1.2" fill="currentColor"></rect><rect x="7.3" y="5.5" width="3.4" height="10.7" rx="1.2" fill="currentColor"></rect><rect x="12.8" y="2.4" width="3.4" height="13.8" rx="1.2" fill="currentColor"></rect></svg>
+          Reports
+        </a>
+      </nav>
+
+      <div style="margin-top:auto;display:flex;flex-direction:column;gap:14px">
+        <div style="background:linear-gradient(150deg,rgba(79,140,255,.16),rgba(43,212,125,.08));border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:15px">
+          <div style="font-size:12px;color:#9aa3b2;font-weight:600">Synced with</div>
+          <div style="font-size:13px;font-weight:700;margin-top:3px;display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:50%;background:#2bd47d;box-shadow:0 0 8px #2bd47d"></span>Google Sheets</div>
+          <div style="font-size:11px;color:#5f6776;margin-top:6px">{{ syncLabel }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:11px;padding:6px 4px">
+          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(140deg,#3a4252,#20242f);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#cfd5e0">AM</div>
+          <div style="min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Alex Morgan</div><div style="font-size:11px;color:#5f6776">Personal</div></div>
+        </div>
+      </div>
+    </aside>
+  </sc-if>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+    <sc-if value="{{ isNarrow }}">
+      <header style="position:sticky;top:0;z-index:20;background:rgba(10,12,16,.86);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.06);padding:13px 16px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(140deg,#4f8cff,#2f5fd6);display:flex;align-items:center;justify-content:center"><div style="width:10px;height:10px;background:#fff;transform:rotate(45deg);border-radius:2px"></div></div>
+          <div style="font-weight:800;font-size:17px;letter-spacing:-.02em">Ledger</div>
+          <div style="margin-left:auto;font-size:12px;color:#9aa3b2;display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:#2bd47d"></span>Sheets</div>
+        </div>
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:2px">
+          <sc-for list="{{ mobileNav }}" as="item" hint-placeholder-count="5">
+            <button onClick="{{ item.onClick }}" style="{{ item.style }}">{{ item.name }}</button>
+          </sc-for>
+        </div>
+      </header>
+    </sc-if>
+
+    <main data-screen-label="Dashboard" style="flex:1;min-width:0;padding:clamp(16px,3.2vw,34px);max-width:1320px;width:100%;margin:0 auto">
+
+      <sc-if value="{{ loading }}">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:18px">
+          <div style="width:38px;height:38px;border-radius:50%;border:3px solid rgba(255,255,255,.1);border-top-color:#4f8cff;animation:mwSpin .8s linear infinite"></div>
+          <div style="color:#9aa3b2;font-size:14px;font-weight:600">Loading your figures from Google Sheets…</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasError }}">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;text-align:center;padding:20px">
+          <div style="width:48px;height:48px;border-radius:14px;background:rgba(251,111,132,.12);border:1px solid rgba(251,111,132,.25);display:flex;align-items:center;justify-content:center;color:#fb6f84;font-size:24px;font-weight:700">!</div>
+          <div style="font-weight:700;font-size:17px">Couldn't reach your sheet</div>
+          <div style="color:#9aa3b2;font-size:13.5px;max-width:420px">{{ loadError }}</div>
+          <button onClick="{{ retryLoad }}" style="height:42px;padding:0 20px;border:none;border-radius:12px;background:linear-gradient(140deg,#5b94ff,#3568e0);color:#fff;font-weight:700;font-size:14px;cursor:pointer">Try again</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ready }}">
+
+      <!-- Page header -->
+      <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px 20px;margin-bottom:24px">
+        <div style="min-width:0">
+          <div style="font-size:13px;font-weight:600;color:#4f8cff;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px">Overview</div>
+          <h1 style="margin:0;font-size:clamp(24px,3.4vw,32px);font-weight:800;letter-spacing:-.025em">Good evening, Alex</h1>
+          <p style="margin:6px 0 0;color:#9aa3b2;font-size:14px">Here's where your money stands this month.</p>
+        </div>
+
+        <div style="margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+          <div style="display:flex;align-items:center;gap:2px;background:#14171f;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:4px">
+            <button onClick="{{ prevMonth }}" aria-label="Previous month" style="width:32px;height:32px;border:none;background:transparent;color:#cfd5e0;border-radius:9px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(255,255,255,.07)">‹</button>
+            <div style="min-width:128px;text-align:center;font-weight:700;font-size:14px">{{ monthLabel }}</div>
+            <button onClick="{{ nextMonth }}" aria-label="Next month" style="width:32px;height:32px;border:none;background:transparent;color:#cfd5e0;border-radius:9px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(255,255,255,.07)">›</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;background:#14171f;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:0 12px;height:42px">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5.2" stroke="#5f6776" stroke-width="1.8"></circle><line x1="11" y1="11" x2="14.5" y2="14.5" stroke="#5f6776" stroke-width="1.8" stroke-linecap="round"></line></svg>
+            <input value="{{ search }}" onInput="{{ onSearch }}" placeholder="Search transactions" style="border:none;background:transparent;color:#eef1f6;outline:none;width:150px;font-size:13.5px"/>
+          </div>
+          <button onClick="{{ openAdd }}" style="height:42px;padding:0 18px;border:none;border-radius:12px;background:linear-gradient(140deg,#5b94ff,#3568e0);color:#fff;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 8px 22px -8px rgba(79,140,255,.8)" style-hover="filter:brightness(1.08)">
+            <span style="font-size:18px;line-height:1;margin-top:-1px">+</span> Add transaction
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(212px,1fr));gap:16px;margin-bottom:18px">
+
+        <div style="position:relative;overflow:hidden;background:radial-gradient(120% 120% at 0% 0%,rgba(79,140,255,.16),transparent 55%),#14171f;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="font-size:13px;color:#9aa3b2;font-weight:600">Total balance</div>
+            <svg width="132" height="40" viewBox="0 0 132 40" style="overflow:visible;flex:none">
+              <defs><linearGradient id="spk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(79,140,255,.4)"></stop><stop offset="1" stop-color="rgba(79,140,255,0)"></stop></linearGradient></defs>
+              <polygon points="{{ sparkAreaPoints }}" fill="url(#spk)"></polygon>
+              <polyline points="{{ sparkPoints }}" fill="none" stroke="#4f8cff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"></polyline>
+            </svg>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:30px;letter-spacing:-.02em;margin-top:8px;font-variant-numeric:tabular-nums">{{ balanceLabel }}</div>
+          <div style="font-size:12.5px;color:#5f6776;margin-top:4px">Net worth across all pots</div>
+        </div>
+
+        <div style="background:#14171f;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:20px">
+          <div style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:3px;background:#2bd47d"></span><div style="font-size:13px;color:#9aa3b2;font-weight:600">Income</div></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:26px;letter-spacing:-.02em;margin-top:12px;font-variant-numeric:tabular-nums;color:#eef1f6">{{ incomeLabel }}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:8px">
+            <span style="font-size:12px;font-weight:700;color:{{ incomeDeltaColor }}">{{ incomeDeltaArrow }} {{ incomeDeltaLabel }}</span>
+            <span style="font-size:12px;color:#5f6776">vs last month</span>
+          </div>
+        </div>
+
+        <div style="background:#14171f;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:20px">
+          <div style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:3px;background:#fb6f84"></span><div style="font-size:13px;color:#9aa3b2;font-weight:600">Expenses</div></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:26px;letter-spacing:-.02em;margin-top:12px;font-variant-numeric:tabular-nums;color:#eef1f6">{{ expenseLabel }}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:8px">
+            <span style="font-size:12px;font-weight:700;color:{{ expenseDeltaColor }}">{{ expenseDeltaArrow }} {{ expenseDeltaLabel }}</span>
+            <span style="font-size:12px;color:#5f6776">vs last month</span>
+          </div>
+        </div>
+
+        <div style="background:#14171f;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:20px">
+          <div style="font-size:13px;color:#9aa3b2;font-weight:600">Saved this month</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:26px;letter-spacing:-.02em;margin-top:12px;font-variant-numeric:tabular-nums;color:{{ savedColor }}">{{ savedLabel }}</div>
+          <div style="font-size:12.5px;color:#5f6776;margin-top:8px">{{ savingsRateLabel }} of income</div>
+        </div>
+      </div>
+
+      <!-- Pots / accounts -->
+      <section style="background:#14171f;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:20px;margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div style="font-weight:700;font-size:16px">Your pots</div>
+          <div style="margin-left:auto;font-size:12.5px;color:#5f6776">Where your money lives</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(184px,1fr));gap:12px">
+          <sc-for list="{{ potTiles }}" as="p" hint-placeholder-count="4">
+            <div style="background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                <div style="width:34px;height:34px;border-radius:10px;background:{{ p.tint }};display:flex;align-items:center;justify-content:center;flex:none"><span style="width:11px;height:11px;border-radius:4px;background:{{ p.color }}"></span></div>
+                <div style="min-width:0"><div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div><div style="font-size:11px;color:#5f6776">{{ p.sub }}</div></div>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:20px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:{{ p.balanceColor }}">{{ p.balanceLabel }}</div>
+              <div style="font-size:11.5px;color:#5f6776;margin-top:3px">{{ p.caption }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- Charts row -->
+      <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:18px">
+
+        <!-- Cash flow -->
+        <section style="flex:2 1 440px;min-width:0;background:#14171f;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:22px">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:22px">
+            <div><div style="font-weight:700;font-size:16px">Cash flow</div><div style="font-size:12.5px;color:#5f6776;margin-top:2px">Income vs expenses · last 6 months</div></div>
+            <div style="margin-left:auto;display:flex;gap:16px">
+              <div style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#9aa3b2"><span style="width:10px;height:10px;border-radius:3px;background:#2bd47d"></span>Income</div>
+              <div style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#9aa3b2"><span style="width:10px;height:10px;border-radius:3px;background:#fb6f84"></span>Expenses</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px;height:196px;padding-top:6px">
+            <sc-for list="{{ trend }}" as="m" hint-placeholder-count="6">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;height:100%">
+                <div title="{{ m.incomeLabel }} in · {{ m.expenseLabel }} out" style="flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:5px">
+                  <div style="{{ m.incomeStyle }}"></div>
+                  <div style="{{ m.expenseStyle }}"></div>
+                </div>
+                <div style="font-size:12px;color:#7b8497;font-weight:600">{{ m.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+
+        <!-- Spending by category -->
+        <section style="flex:1 1 320px;min-width:0;background:#14171f;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:22px">
+          <div style="font-weight:700;font-size:16px">Spending by category</div>
+          <div style="font-size:12.5px;color:#5f6776;margin-top:2px;margin-bottom:16px">{{ monthLabel }}</div>
+          <div style="display:flex;justify-content:center;margin-bottom:18px">
+            <div style="position:relative;width:160px;height:160px">
+              <svg width="160" height="160" viewBox="0 0 140 140">
+                <g transform="rotate(-90 70 70)">
+                  <circle cx="70" cy="70" r="54" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="17"></circle>
+                  <sc-for list="{{ donutSegments }}" as="s" hint-placeholder-count="6">
+                    <circle cx="70" cy="70" r="54" fill="none" stroke="{{ s.color }}" stroke-width="17" stroke-dasharray="{{ s.dash }}" stroke-dashoffset="{{ s.offset }}" stroke-linecap="butt"></circle>
+                  </sc-for>
+                </g>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+                <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:21px;letter-spacing:-.02em">{{ totalExpenseLabel }}</div>
+                <div style="font-size:11px;color:#5f6776;margin-top:2px">spent</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:13px">
+            <sc-for list="{{ categoryList }}" as="c" hint-placeholder-count="6">
+              <div>
+                <div style="display:flex;align-items:center;gap:9px;font-size:13px">
+                  <span style="width:9px;height:9px;border-radius:3px;background:{{ c.color }};flex:none"></span>
+                  <span style="font-weight:600;color:#dfe4ec">{{ c.name }}</span>
+                  <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:500;color:#cfd5e0;font-size:12.5px">{{ c.spentLabel }}</span>
+                  <span style="color:#5f6776;font-size:12px;width:36px;text-align:right">{{ c.pctLabel }}</span>
+                </div>
+                <div style="height:5px;border-radius:4px;background:rgba(255,255,255,.05);margin-top:7px;overflow:hidden">
+                  <div style="{{ c.barStyle }}"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+
+      <!-- Lower row -->
+      <div style="display:flex;flex-wrap:wrap;gap:16px">
+
+        <!-- Recent transactions -->
+        <section style="flex:2 1 480px;min-width:0;background:#14171f;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:22px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <div style="font-weight:700;font-size:16px">Recent transactions</div>
+            <div style="margin-left:auto;font-size:12.5px;color:#5f6776">{{ recentCountLabel }}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:58px 1fr 148px 112px 28px;gap:10px;padding:0 6px 10px;border-bottom:1px solid rgba(255,255,255,.06);font-size:11px;color:#5f6776;font-weight:700;text-transform:uppercase;letter-spacing:.05em">
+            <div>Date</div><div>Description</div><div>Category</div><div style="text-align:right">Amount</div><div></div>
+          </div>
+          <div style="max-height:412px;overflow-y:auto;margin:0 -6px">
+            <sc-for list="{{ recentRows }}" as="row" hint-placeholder-count="7">
+              <div onClick="{{ row.onEdit }}" style="display:grid;grid-template-columns:58px 1fr 148px 112px 28px;gap:10px;align-items:center;padding:11px 6px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;border-radius:8px" style-hover="background:rgba(255,255,255,.03)">
+                <div style="font-size:12px;color:#7b8497;font-family:'JetBrains Mono',monospace;font-weight:500">{{ row.dateLabel }}</div>
+                <div style="min-width:0">
+                  <div style="font-size:13.5px;font-weight:600;color:#eef1f6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.desc }}</div>
+                  <div style="font-size:11.5px;color:#5f6776;margin-top:1px">{{ row.accountLabel }}</div>
+                </div>
+                <div onClick="{{ stopClick }}">
+                  <sc-if value="{{ row.isExpense }}">
+                    <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:0 8px;height:32px">
+                      <span style="width:8px;height:8px;border-radius:3px;background:{{ row.catColor }};flex:none"></span>
+                      <select value="{{ row.category }}" onChange="{{ row.onRecat }}" style="border:none;background:transparent;color:#cfd5e0;font-size:12.5px;font-weight:600;outline:none;cursor:pointer;width:100%;appearance:none;-webkit-appearance:none">
+                        <sc-for list="{{ expenseCatOptions }}" as="opt" hint-placeholder-count="8">
+                          <option value="{{ opt }}">{{ opt }}</option>
+                        </sc-for>
+                      </select>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ row.isIncome }}">
+                    <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(43,212,125,.12);border:1px solid rgba(43,212,125,.22);border-radius:8px;padding:6px 10px;font-size:12.5px;font-weight:600;color:#2bd47d">
+                      <span style="width:8px;height:8px;border-radius:3px;background:#2bd47d"></span>{{ row.category }}
+                    </span>
+                  </sc-if>
+                  <sc-if value="{{ row.isTransfer }}">
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;color:#9aa3b2;white-space:nowrap">
+                      <span style="color:#7fb0ff;font-size:13px">⇄</span>{{ row.transferLabel }}
+                    </span>
+                  </sc-if>
+                </div>
+                <div style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13.5px;font-variant-numeric:tabular-nums;color:{{ row.amountColor }}">{{ row.amountLabel }}</div>
+                <div style="text-align:center;color:#5f6776;font-size:16px">›</div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noRecent }}">
+              <div style="padding:48px 0;text-align:center;color:#5f6776;font-size:13.5px">No transactions match your search.</div>
+            </sc-if>
+          </div>
+        </section>
+
+        <!-- Upcoming bills -->
+        <section style="flex:1 1 300px;min-width:0;background:#14171f;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:22px">
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px">
+            <div style="font-weight:700;font-size:16px">Upcoming bills</div>
+            <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:14px;color:#f5b13d">{{ upcomingTotalLabel }}</div>
+          </div>
+          <div style="font-size:12.5px;color:#5f6776;margin-bottom:16px">Recurring · next 30 days</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ upcomingBills }}" as="b" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:13px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05)">
+                <div style="width:38px;height:38px;border-radius:11px;background:{{ b.tint }};display:flex;align-items:center;justify-content:center;flex:none">
+                  <span style="width:11px;height:11px;border-radius:4px;background:{{ b.color }}"></span>
+                </div>
+                <div style="min-width:0;flex:1">
+                  <div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.name }}</div>
+                  <div style="font-size:11.5px;margin-top:2px;color:{{ b.whenColor }};font-weight:600">{{ b.dateLabel }} · {{ b.whenLabel }}</div>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13.5px;color:#dfe4ec">{{ b.amountLabel }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+
+      </sc-if>
+
+    </main>
+  </div>
+
+  <!-- Add / edit modal -->
+  <sc-if value="{{ modalOpen }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:60;background:rgba(6,8,12,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;animation:mwBack .18s ease">
+      <div onClick="{{ stopClick }}" style="width:100%;max-width:440px;background:#14171f;border:1px solid rgba(255,255,255,.09);border-radius:20px;padding:26px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8);animation:mwPanel .24s cubic-bezier(.2,.8,.2,1)">
+        <div style="display:flex;align-items:center;margin-bottom:22px">
+          <div style="font-weight:800;font-size:19px;letter-spacing:-.02em">{{ modalTitle }}</div>
+          <button onClick="{{ closeModal }}" aria-label="Close" style="margin-left:auto;width:34px;height:34px;border:none;background:rgba(255,255,255,.05);color:#9aa3b2;border-radius:10px;cursor:pointer;font-size:17px" style-hover="background:rgba(255,255,255,.1);color:#fff">✕</button>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:18px">
+          <button onClick="{{ setTypeExpense }}" style="{{ formTypeExpenseStyle }}">Expense</button>
+          <button onClick="{{ setTypeIncome }}" style="{{ formTypeIncomeStyle }}">Income</button>
+          <button onClick="{{ setTypeTransfer }}" style="{{ formTypeTransferStyle }}">Transfer</button>
+        </div>
+
+        <label style="display:block;font-size:12px;font-weight:700;color:#9aa3b2;margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em">Description</label>
+        <input value="{{ formDesc }}" onInput="{{ onFormDesc }}" placeholder="e.g. Whole Foods · ATM withdrawal" style="width:100%;height:44px;background:#0f1218;border:1px solid rgba(255,255,255,.09);border-radius:11px;color:#eef1f6;padding:0 13px;font-size:14px;outline:none;margin-bottom:16px"/>
+
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <div style="flex:1">
+            <label style="display:block;font-size:12px;font-weight:700;color:#9aa3b2;margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em">Amount</label>
+            <div style="display:flex;align-items:center;height:44px;background:#0f1218;border:1px solid rgba(255,255,255,.09);border-radius:11px;padding:0 13px">
+              <span style="color:#5f6776;font-family:'JetBrains Mono',monospace;font-size:15px">$</span>
+              <input value="{{ formAmount }}" onInput="{{ onFormAmount }}" type="number" min="0" step="0.01" placeholder="0.00" style="flex:1;border:none;background:transparent;color:#eef1f6;padding:0 0 0 7px;font-size:14px;outline:none;font-family:'JetBrains Mono',monospace"/>
+            </div>
+          </div>
+          <div style="flex:1">
+            <label style="display:block;font-size:12px;font-weight:700;color:#9aa3b2;margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em">Date</label>
+            <input value="{{ formDate }}" onInput="{{ onFormDate }}" type="date" style="width:100%;height:44px;background:#0f1218;border:1px solid rgba(255,255,255,.09);border-radius:11px;color:#eef1f6;padding:0 13px;font-size:14px;outline:none;color-scheme:dark"/>
+          </div>
+        </div>
+
+        <sc-if value="{{ formIsFlow }}">
+          <div style="display:flex;gap:12px;margin-bottom:20px">
+            <div style="flex:1">
+              <label style="display:block;font-size:12px;font-weight:700;color:#9aa3b2;margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em">Category</label>
+              <select value="{{ formCategory }}" onChange="{{ onFormCategory }}" style="width:100%;height:44px;background:#0f1218;border:1px solid rgba(255,255,255,.09);border-radius:11px;color:#eef1f6;padding:0 11px;font-size:14px;outline:none;cursor:pointer">
+                <sc-for list="{{ allCatOptions }}" as="opt" hint-placeholder-count="8">
+                  <option value="{{ opt }}">{{ opt }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="flex:1">
+              <label style="display:block;font-size:12px;font-weight:700;color:#9aa3b2;margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em">Pot</label>
+              <select value="{{ formAccount }}" onChange="{{ onFormAccount }}" style="width:100%;height:44px;background:#0f1218;border:1px solid rgba(255,255,255,.09);border-radius:11px;color:#eef1f6;padding:0 11px;font-size:14px;outline:none;cursor:pointer">
+                <sc-for list="{{ potOptions }}" as="opt" hint-placeholder-count="4">
+                  <option value="{{ opt }}">{{ opt }}</option>
+                </sc-for>
+              </select>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ formIsTransfer }}">
+          <div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:20px">
+            <div style="flex:1">
+              <label style="display:block;font-size:12px;font-weight:700;color:#9aa3b2;margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em">From pot</label>
+              <select value="{{ formFrom }}" onChange="{{ onFormFrom }}" style="width:100%;height:44px;background:#0f1218;border:1px solid rgba(255,255,255,.09);border-radius:11px;color:#eef1f6;padding:0 11px;font-size:14px;outline:none;cursor:pointer">
+                <sc-for list="{{ potOptions }}" as="opt" hint-placeholder-count="4">
+                  <option value="{{ opt }}">{{ opt }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="color:#7fb0ff;font-size:18px;padding-bottom:11px">→</div>
+            <div style="flex:1">
+              <label style="display:block;font-size:12px;font-weight:700;color:#9aa3b2;margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em">To pot</label>
+              <select value="{{ formTo }}" onChange="{{ onFormTo }}" style="width:100%;height:44px;background:#0f1218;border:1px solid rgba(255,255,255,.09);border-radius:11px;color:#eef1f6;padding:0 11px;font-size:14px;outline:none;cursor:pointer">
+                <sc-for list="{{ potOptions }}" as="opt" hint-placeholder-count="4">
+                  <option value="{{ opt }}">{{ opt }}</option>
+                </sc-for>
+              </select>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ formError }}">
+          <div style="background:rgba(251,111,132,.12);border:1px solid rgba(251,111,132,.25);color:#fb6f84;font-size:12.5px;font-weight:600;padding:10px 12px;border-radius:10px;margin-bottom:16px">{{ formError }}</div>
+        </sc-if>
+
+        <div style="display:flex;gap:10px;align-items:center">
+          <sc-if value="{{ isEditing }}">
+            <button onClick="{{ deleteCurrent }}" style="height:46px;padding:0 16px;border:1px solid rgba(251,111,132,.3);background:transparent;color:#fb6f84;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer" style-hover="background:rgba(251,111,132,.1)">Delete</button>
+          </sc-if>
+          <button onClick="{{ saveForm }}" style="flex:1;height:46px;border:none;border-radius:12px;background:linear-gradient(140deg,#5b94ff,#3568e0);color:#fff;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 8px 22px -8px rgba(79,140,255,.8)" style-hover="filter:brightness(1.08)">{{ saveLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.API = 'https://script.google.com/macros/s/AKfycbyQwr2F-XWQID7ZDcvKqImXpDaZumsqRm1Mx7wgAcno5YxsfwF545QaUOI85vXwZHOg/exec';
+    this.CATS = {
+      Housing:      { color:'#4f8cff' },
+      Utilities:    { color:'#f08a5d' },
+      Groceries:    { color:'#2bd47d' },
+      Dining:       { color:'#f5b13d' },
+      Transport:    { color:'#a78bfa' },
+      Shopping:     { color:'#fb6f84' },
+      Subscriptions:{ color:'#38d6c8' },
+      Health:       { color:'#f49ac2' },
+    };
+    this.INCOME_CATS = ['Salary','Freelance'];
+    // POTS / POT_NAMES / START_BALANCE / RECURRING are loaded from the sheet
+    this.POTS = [];
+    this.POT_NAMES = [];
+    this.START_BALANCE = 0;
+    this.RECURRING = [];
+    this.TODAY = { y:2026, m:6, d:12 };
+    this.state = {
+      year:2026, month:6,
+      transactions: [],
+      loading:true, loadError:'', syncing:false,
+      modalOpen:false, editingId:null,
+      form: this.blankForm(),
+      formError:'',
+      search:'', isNarrow:false, nav:'Overview',
+    };
+    this.onResize = this.onResize.bind(this);
+  }
+
+  componentDidMount(){
+    this.onResize();
+    window.addEventListener('resize', this.onResize);
+    this.loadData();
+  }
+  componentWillUnmount(){ window.removeEventListener('resize', this.onResize); }
+  onResize(){ const n = window.innerWidth < 900; if (n !== this.state.isNarrow) this.setState({ isNarrow:n }); }
+
+  loadData(){
+    this.setState({ loading:true, loadError:'' });
+    fetch(this.API, { method:'GET' })
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(data => {
+        if (data.error) throw new Error(data.error);
+        this.POTS = Array.isArray(data.pots) ? data.pots : [];
+        this.POT_NAMES = this.POTS.map(p => p.name);
+        this.START_BALANCE = this.POTS.reduce((a,p)=>a+(p.start||0),0);
+        this.RECURRING = Array.isArray(data.bills) ? data.bills : [];
+        const txs = Array.isArray(data.transactions) ? data.transactions : [];
+        this.setState({ transactions: txs, loading:false, loadError:'' });
+      })
+      .catch(err => {
+        this.setState({ loading:false, loadError: String(err && err.message ? err.message : err) });
+      });
+  }
+
+  // Fire-and-forget write to the sheet. Optimistic UI already updated state;
+  // on failure we surface a banner and reload to resync.
+  postAction(payload){
+    this.setState({ syncing:true });
+    fetch(this.API, {
+      method:'POST',
+      body: JSON.stringify(payload),
+    })
+      .then(r => r.json())
+      .then(res => {
+        if (res && res.ok === false) throw new Error(res.error || 'write failed');
+        // For adds, adopt the real server-assigned id.
+        if (payload.action === 'add' && res && res.id != null && payload.__localId != null){
+          this.setState(s => ({
+            syncing:false,
+            transactions: s.transactions.map(t => t.id===payload.__localId ? { ...t, id:res.id } : t),
+          }));
+        } else {
+          this.setState({ syncing:false });
+        }
+      })
+      .catch(err => {
+        this.setState({ syncing:false, loadError: 'Sync failed: ' + (err && err.message ? err.message : err) });
+        this.loadData(); // resync from source of truth
+      });
+  }
+
+  monthKey(y,m){ return y + '-' + String(m).padStart(2,'0'); }
+  blankForm(){ return { desc:'', amount:'', category:'Groceries', type:'expense', account:'Bank', from:'Bank', to:'Wallet', date:'2026-06-12' }; }
+
+  changeMonth(d){
+    let m = this.state.month + d, y = this.state.year;
+    while (m<1){ m+=12; y--; } while (m>12){ m-=12; y++; }
+    this.setState({ month:m, year:y });
+  }
+  openAdd(){ this.setState({ modalOpen:true, editingId:null, form:this.blankForm(), formError:'' }); }
+  openEdit(t){ this.setState({ modalOpen:true, editingId:t.id, formError:'', form:{ desc:t.desc, amount:String(t.amount), category:t.category||'Groceries', type:t.type, account:t.account||'Bank', from:t.from||'Bank', to:t.to||'Wallet', date:t.date } }); }
+  setForm(k,v){ this.setState(s => ({ form:{ ...s.form, [k]:v }, formError:'' })); }
+  setType(tp){ this.setState(s => { const f={ ...s.form, type:tp };
+    if (tp==='income' && !this.INCOME_CATS.includes(f.category)) f.category='Salary';
+    if (tp==='expense' && this.INCOME_CATS.includes(f.category)) f.category='Groceries';
+    return { form:f, formError:'' }; }); }
+  recategorize(id,cat){
+    let updated = null;
+    this.setState(s => {
+      const txs = s.transactions.map(t => t.id===id ? (updated = { ...t, category:cat }) : t);
+      return { transactions: txs };
+    }, () => { if (updated) this.postAction({ action:'update', tx: updated }); });
+  }
+  saveForm(){
+    const f = this.state.form; const amt = parseFloat(f.amount);
+    if (!(amt > 0)) { this.setState({ formError:'Enter an amount greater than $0.' }); return; }
+    if (f.type==='transfer') {
+      if (f.from===f.to) { this.setState({ formError:'Choose two different pots to transfer between.' }); return; }
+    } else if (!f.desc.trim()) { this.setState({ formError:'Add a description for this transaction.' }); return; }
+    this.setState(s => {
+      let data;
+      if (f.type==='transfer') {
+        data = { desc:(f.desc.trim() || (f.from + ' → ' + f.to)), amount:Math.round(amt*100)/100, category:null, type:'transfer', account:f.from, from:f.from, to:f.to, date:f.date };
+      } else {
+        data = { desc:f.desc.trim(), amount:Math.round(amt*100)/100, category:f.category, type:f.type, account:f.account, date:f.date };
+      }
+      let txs, saved;
+      if (s.editingId) {
+        saved = { id:s.editingId, ...data };
+        txs = s.transactions.map(t => t.id===s.editingId ? { ...t, ...data } : t);
+      } else {
+        const id = Math.max(0, ...s.transactions.map(t=>t.id)) + 1;
+        saved = { id, ...data };
+        txs = [...s.transactions, saved];
+      }
+      this.__pendingSave = { editing: !!s.editingId, tx: saved };
+      return { transactions:txs, modalOpen:false, formError:'' };
+    }, () => {
+      const p = this.__pendingSave; this.__pendingSave = null;
+      if (!p) return;
+      if (p.editing) this.postAction({ action:'update', tx: p.tx });
+      else this.postAction({ action:'add', tx: p.tx, __localId: p.tx.id });
+    });
+  }
+  deleteCurrent(){
+    const id = this.state.editingId;
+    this.setState(s => ({ transactions: s.transactions.filter(t => t.id !== s.editingId), modalOpen:false }),
+      () => { if (id != null) this.postAction({ action:'delete', id: id }); });
+  }
+
+  hexA(hex,a){ const h=hex.replace('#',''); const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16); return 'rgba('+r+','+g+','+b+','+a+')'; }
+
+  renderVals(){
+    const S = this.state, C = this.CATS;
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const cur = (n, dec=0) => { const s = n<0?'-':''; const v = Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}); return s + '$' + v; };
+    const tx = S.transactions;
+    const mk = this.monthKey(S.year, S.month);
+    const sumType = (arr,type) => arr.filter(t=>t.type===type).reduce((a,b)=>a+b.amount,0);
+
+    const curTx = tx.filter(t => t.date.slice(0,7)===mk);
+    const income = sumType(curTx,'income');
+    const expenses = sumType(curTx,'expense');
+    const net = income - expenses;
+
+    let pm = S.month-1, py = S.year; if (pm<1){ pm=12; py--; }
+    const prevTx = tx.filter(t => t.date.slice(0,7)===this.monthKey(py,pm));
+    const prevIncome = sumType(prevTx,'income');
+    const prevExpenses = sumType(prevTx,'expense');
+    const pctOf = (c,p) => p ? ((c-p)/p*100) : 0;
+    const incPct = pctOf(income,prevIncome), expPct = pctOf(expenses,prevExpenses);
+    const incUp = income >= prevIncome, expUp = expenses >= prevExpenses;
+    const GREEN='#2bd47d', ROSE='#fb6f84';
+
+    const cutoff = mk + '-31';
+    const upto = tx.filter(t => t.date <= cutoff);
+    const potBal = (name) => { let v=0; for (const t of upto){ if (t.type==='transfer'){ if (t.from===name) v-=t.amount; if (t.to===name) v+=t.amount; } else if (t.account===name){ v += t.type==='income' ? t.amount : -t.amount; } } return v; };
+    const potVals = this.POTS.map(p => p.start + potBal(p.name));
+    const balance = potVals.reduce((a,b)=>a+b,0);
+    const potTiles = this.POTS.map((p,i) => { const bal = potVals[i]; return { name:p.name, sub:p.sub, color:p.color, tint:this.hexA(p.color,.16), balanceLabel: cur(Math.abs(bal),2), balanceColor: p.credit ? (bal<0?'#fb6f84':'#2bd47d') : '#eef1f6', caption: p.credit ? (bal<0?'Balance owed':'In credit') : 'Available' }; });
+
+    const trendMonths = [];
+    for (let i=5;i>=0;i--){ let m=S.month-i, y=S.year; while(m<1){m+=12;y--;} trendMonths.push({y,m}); }
+    const trendRaw = trendMonths.map(({y,m}) => { const mt = tx.filter(t=>t.date.slice(0,7)===this.monthKey(y,m)); return { label:monthNames[m-1].slice(0,3), income:sumType(mt,'income'), expense:sumType(mt,'expense') }; });
+    const maxVal = Math.max(1, ...trendRaw.map(t=>Math.max(t.income,t.expense)));
+    const BAR = 150;
+    const trend = trendRaw.map(t => ({
+      label:t.label, incomeLabel:cur(t.income), expenseLabel:cur(t.expense),
+      incomeStyle:{ height:Math.max(4, t.income/maxVal*BAR)+'px', width:'15px', borderRadius:'5px 5px 2px 2px', background:'linear-gradient(180deg,#39d684,#1fa862)' },
+      expenseStyle:{ height:Math.max(4, t.expense/maxVal*BAR)+'px', width:'15px', borderRadius:'5px 5px 2px 2px', background:'linear-gradient(180deg,#ff8497,#e85a72)' },
+    }));
+
+    const bals = trendMonths.map(({y,m}) => this.START_BALANCE + tx.filter(t=>t.date<=this.monthKey(y,m)+'-31').reduce((a,b)=> a + (b.type==='income'? b.amount : b.type==='expense'? -b.amount : 0),0));
+    const bmin = Math.min(...bals), bmax = Math.max(...bals), span = Math.max(1, bmax-bmin);
+    const SW=132, SH=40, n=bals.length;
+    const pts = bals.map((b,i)=>{ const x=(i/(n-1))*SW; const y=SH-((b-bmin)/span)*(SH-7)-3.5; return x.toFixed(1)+','+y.toFixed(1); });
+    const sparkPoints = pts.join(' ');
+    const sparkAreaPoints = '0,'+SH+' '+sparkPoints+' '+SW+','+SH;
+
+    const catNames = Object.keys(C);
+    const catRaw = catNames.map(name => ({ name, color:C[name].color, spent: curTx.filter(t=>t.type==='expense'&&t.category===name).reduce((a,b)=>a+b.amount,0) })).filter(c=>c.spent>0);
+    catRaw.sort((a,b)=>b.spent-a.spent);
+    const totalExp = expenses || 1;
+    const r=54, CIRC=2*Math.PI*r; let acc=0;
+    const donutSegments = catRaw.map(c => { const len=c.spent/totalExp*CIRC; const seg={ color:c.color, dash:len.toFixed(2)+' '+(CIRC-len).toFixed(2), offset:(-acc).toFixed(2) }; acc+=len; return seg; });
+    const categoryList = catRaw.map(c => { const share=c.spent/totalExp*100; return { name:c.name, color:c.color, spentLabel:cur(c.spent), pctLabel:Math.round(share)+'%', barStyle:{ width:share+'%', height:'100%', borderRadius:'4px', background:c.color } }; });
+
+    const expenseCatOptions = catNames;
+    const recentSorted = [...curTx].sort((a,b)=> a.date<b.date?1 : a.date>b.date?-1 : b.id-a.id);
+    const term = S.search.trim().toLowerCase();
+    const filtered = term ? recentSorted.filter(t=>t.desc.toLowerCase().includes(term)||(t.category||'').toLowerCase().includes(term)) : recentSorted;
+    const recentRows = filtered.map(t => {
+      const isInc = t.type==='income', isXfer = t.type==='transfer', isExp = t.type==='expense';
+      const color = isXfer ? '#8b93a7' : isInc ? '#2bd47d' : (C[t.category] ? C[t.category].color : '#8b93a7');
+      const d = new Date(t.date + 'T00:00:00');
+      return {
+        id:t.id, desc:t.desc, category:t.category,
+        accountLabel: isXfer ? 'Transfer' : t.account,
+        isIncome:isInc, isExpense:isExp, isTransfer:isXfer, catColor:color,
+        transferLabel: isXfer ? (t.from + '   →   ' + t.to) : '',
+        dateLabel: d.toLocaleDateString('en-US',{month:'short',day:'numeric'}),
+        amountLabel: isXfer ? cur(t.amount,2) : (isInc?'+':'−') + cur(t.amount,2),
+        amountColor: isXfer ? '#9aa3b2' : isInc ? '#2bd47d' : '#cfd5e0',
+        onEdit: () => this.openEdit(t),
+        onRecat: (e) => this.recategorize(t.id, e.target.value),
+      };
+    });
+
+    const T = this.TODAY; const todayDate = new Date(T.y, T.m-1, T.d);
+    const upcomingBills = this.RECURRING.map(b => {
+      let y=T.y, m=T.m, due=new Date(y,m-1,b.day);
+      if (due < todayDate){ m++; if(m>12){m=1;y++;} due=new Date(y,m-1,b.day); }
+      const days = Math.round((due-todayDate)/86400000);
+      const color = C[b.cat] ? C[b.cat].color : '#8b93a7';
+      return { name:b.name, amountLabel:cur(b.amount,2), amount:b.amount, color, tint:this.hexA(color,.14),
+        dateLabel: due.toLocaleDateString('en-US',{month:'short',day:'numeric'}),
+        days, whenLabel: days===0?'Today':days===1?'Tomorrow':'in '+days+' days',
+        whenColor: days<=3 ? '#f5b13d' : '#7b8497' };
+    }).sort((a,b)=>a.days-b.days).slice(0,6);
+
+    const f = S.form;
+    const typeBase = { flex:'1', padding:'10px 0', borderRadius:'10px', cursor:'pointer', fontWeight:'700', fontSize:'13.5px', transition:'all .15s', border:'1px solid rgba(255,255,255,.08)', background:'transparent', color:'#9aa3b2' };
+    const formTypeExpenseStyle = { ...typeBase, ...(f.type==='expense' ? { background:'rgba(251,111,132,.15)', color:'#fb6f84', borderColor:'rgba(251,111,132,.4)' } : {}) };
+    const formTypeIncomeStyle  = { ...typeBase, ...(f.type==='income'  ? { background:'rgba(43,212,125,.15)', color:'#2bd47d', borderColor:'rgba(43,212,125,.4)' } : {}) };
+    const formTypeTransferStyle = { ...typeBase, ...(f.type==='transfer' ? { background:'rgba(79,140,255,.15)', color:'#7fb0ff', borderColor:'rgba(79,140,255,.4)' } : {}) };
+    const allCatOptions = f.type==='income' ? this.INCOME_CATS : catNames;
+
+    const navItems = ['Overview','Transactions','Budgets','Bills','Reports'];
+    const mobileNav = navItems.map(name => ({ name, onClick:()=>this.setState({nav:name}), style:{ flex:'none', padding:'8px 14px', borderRadius:'10px', border:'1px solid '+(name===S.nav?'rgba(79,140,255,.3)':'rgba(255,255,255,.07)'), background:name===S.nav?'rgba(79,140,255,.14)':'transparent', color:name===S.nav?'#bfe0ff':'#9aa3b2', fontWeight:'600', fontSize:'13px', cursor:'pointer', whiteSpace:'nowrap' } }));
+
+    return {
+      isNarrow:S.isNarrow, isWide:!S.isNarrow, mobileNav,
+      loading:S.loading, loadError:S.loadError, syncing:S.syncing,
+      hasError: !!S.loadError, ready: !S.loading && !S.loadError,
+      syncLabel: S.syncing ? 'Syncing…' : (S.loadError ? 'Sync error' : 'Updated just now'),
+      retryLoad: () => this.loadData(),
+      monthLabel: monthNames[S.month-1] + ' ' + S.year,
+      prevMonth: () => this.changeMonth(-1),
+      nextMonth: () => this.changeMonth(1),
+      search:S.search, onSearch:(e)=>this.setState({ search:e.target.value }),
+      openAdd: () => this.openAdd(),
+      stopClick: (e) => e.stopPropagation(),
+
+      balanceLabel: cur(balance), sparkPoints, sparkAreaPoints, potTiles,
+      incomeLabel: cur(income), expenseLabel: cur(expenses),
+      savedLabel: (net<0?'−':'+') + cur(Math.abs(net)),
+      savedColor: net>=0 ? '#2bd47d' : '#fb6f84',
+      savingsRateLabel: income ? Math.round(net/income*100)+'%' : '—',
+      incomeDeltaLabel: Math.abs(incPct).toFixed(1)+'%', incomeDeltaColor: incUp?GREEN:ROSE, incomeDeltaArrow: incUp?'▲':'▼',
+      expenseDeltaLabel: Math.abs(expPct).toFixed(1)+'%', expenseDeltaColor: expUp?ROSE:GREEN, expenseDeltaArrow: expUp?'▲':'▼',
+
+      trend, donutSegments, totalExpenseLabel: cur(expenses), categoryList,
+      recentRows, expenseCatOptions, noRecent: filtered.length===0,
+      recentCountLabel: filtered.length + (filtered.length===1?' transaction':' transactions'),
+      upcomingBills, upcomingTotalLabel: cur(upcomingBills.reduce((a,b)=>a+b.amount,0),2),
+
+      modalOpen:S.modalOpen, isEditing:!!S.editingId,
+      modalTitle: S.editingId ? 'Edit transaction' : 'Add transaction',
+      saveLabel: S.editingId ? 'Save changes' : 'Add transaction',
+      formError:S.formError,
+      closeModal: () => this.setState({ modalOpen:false }),
+      saveForm: () => this.saveForm(), deleteCurrent: () => this.deleteCurrent(),
+      formDesc:f.desc, formAmount:f.amount, formCategory:f.category, formAccount:f.account, formDate:f.date,
+      onFormDesc:(e)=>this.setForm('desc',e.target.value),
+      onFormAmount:(e)=>this.setForm('amount',e.target.value),
+      onFormCategory:(e)=>this.setForm('category',e.target.value),
+      onFormAccount:(e)=>this.setForm('account',e.target.value),
+      onFormDate:(e)=>this.setForm('date',e.target.value),
+      setTypeExpense:()=>this.setType('expense'), setTypeIncome:()=>this.setType('income'),
+      formTypeExpenseStyle, formTypeIncomeStyle, formTypeTransferStyle, allCatOptions, potOptions:this.POT_NAMES,
+      formIsFlow: f.type!=='transfer', formIsTransfer: f.type==='transfer',
+      formFrom:f.from, formTo:f.to,
+      onFormFrom:(e)=>this.setForm('from',e.target.value),
+      onFormTo:(e)=>this.setForm('to',e.target.value),
+      setTypeTransfer:()=>this.setType('transfer'),
+    };
+  }
+}
+</script>
+</body>
+</html>
