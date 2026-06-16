@@ -586,7 +586,7 @@ class Component extends DCLogic {
   renderVals(){
     const S = this.state, C = this.CATS;
     const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const cur = (n, dec=0) => { const s = n<0?'-':''; const v = Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}); return s + '£' + v; };
+    const cur = (n, dec=2) => { const s = n<0?'-':''; const v = Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}); return s + '£' + v; };
     const tx = S.transactions;
     const mk = this.monthKey(S.year, S.month);
     const sumType = (arr,type) => arr.filter(t=>t.type===type).reduce((a,b)=>a+b.amount,0);
