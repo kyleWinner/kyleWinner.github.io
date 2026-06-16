@@ -497,7 +497,8 @@ class Component extends DCLogic {
   // on failure we surface a banner and reload to resync.
   postAction(payload){
     this.setState({ syncing:true });
-    fetch(this.API, {
+    var qs = '?payload=' + encodeURIComponent(JSON.stringify(payload));
+    fetch(this.API + qs, {
       method:'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload),
