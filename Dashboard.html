@@ -278,39 +278,78 @@
           </sc-if>
           <div style="max-height:412px;overflow-y:auto;margin:0 -6px">
             <sc-for list="{{ recentRows }}" as="row" hint-placeholder-count="7">
-              <div onClick="{{ row.onEdit }}" style="{{ row.rowStyle }}" style-hover="background:rgba(255,255,255,.03)">
-                <div style="display:flex;align-items:center;gap:10px;min-width:0">
-                  <div style="font-size:12px;color:#7b8497;font-family:'JetBrains Mono',monospace;font-weight:500;flex:none;width:52px">{{ row.dateLabel }}</div>
-                  <div style="min-width:0;flex:1">
+
+              <!-- Desktop: single-line grid row -->
+              <sc-if value="{{ isWide }}">
+                <div onClick="{{ row.onEdit }}" style="display:grid;grid-template-columns:58px 1fr 148px 112px 28px;gap:10px;align-items:center;padding:11px 6px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;border-radius:8px" style-hover="background:rgba(255,255,255,.03)">
+                  <div style="font-size:12px;color:#7b8497;font-family:'JetBrains Mono',monospace;font-weight:500">{{ row.dateLabel }}</div>
+                  <div style="min-width:0">
                     <div style="font-size:13.5px;font-weight:600;color:#eef1f6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.desc }}</div>
                     <div style="font-size:11.5px;color:#5f6776;margin-top:1px">{{ row.accountLabel }}</div>
                   </div>
-                  <div style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13.5px;font-variant-numeric:tabular-nums;flex:none;white-space:nowrap;color:{{ row.amountColor }}">{{ row.amountLabel }}</div>
-                  <sc-if value="{{ isWide }}"><div style="text-align:center;color:#5f6776;font-size:16px;flex:none;width:20px">›</div></sc-if>
+                  <div onClick="{{ stopClick }}">
+                    <sc-if value="{{ row.isExpense }}">
+                      <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:0 8px;height:32px">
+                        <span style="width:8px;height:8px;border-radius:3px;background:{{ row.catColor }};flex:none"></span>
+                        <select value="{{ row.category }}" onChange="{{ row.onRecat }}" style="border:none;background:transparent;color:#cfd5e0;font-size:12.5px;font-weight:600;outline:none;cursor:pointer;width:100%;appearance:none;-webkit-appearance:none">
+                          <sc-for list="{{ expenseCatOptions }}" as="opt" hint-placeholder-count="8">
+                            <option value="{{ opt }}">{{ opt }}</option>
+                          </sc-for>
+                        </select>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ row.isIncome }}">
+                      <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(43,212,125,.12);border:1px solid rgba(43,212,125,.22);border-radius:8px;padding:6px 10px;font-size:12.5px;font-weight:600;color:#2bd47d">
+                        <span style="width:8px;height:8px;border-radius:3px;background:#2bd47d"></span>{{ row.category }}
+                      </span>
+                    </sc-if>
+                    <sc-if value="{{ row.isTransfer }}">
+                      <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;color:#9aa3b2;white-space:nowrap">
+                        <span style="color:#7fb0ff;font-size:13px">⇄</span>{{ row.transferLabel }}
+                      </span>
+                    </sc-if>
+                  </div>
+                  <div style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13.5px;font-variant-numeric:tabular-nums;color:{{ row.amountColor }}">{{ row.amountLabel }}</div>
+                  <div style="text-align:center;color:#5f6776;font-size:16px">›</div>
                 </div>
-                <div onClick="{{ stopClick }}" style="{{ row.catWrapStyle }}">
-                  <sc-if value="{{ row.isExpense }}">
-                    <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:0 8px;height:32px;max-width:200px">
-                      <span style="width:8px;height:8px;border-radius:3px;background:{{ row.catColor }};flex:none"></span>
-                      <select value="{{ row.category }}" onChange="{{ row.onRecat }}" style="border:none;background:transparent;color:#cfd5e0;font-size:12.5px;font-weight:600;outline:none;cursor:pointer;width:100%;appearance:none;-webkit-appearance:none">
-                        <sc-for list="{{ expenseCatOptions }}" as="opt" hint-placeholder-count="8">
-                          <option value="{{ opt }}">{{ opt }}</option>
-                        </sc-for>
-                      </select>
+              </sc-if>
+
+              <!-- Mobile: stacked row -->
+              <sc-if value="{{ isNarrow }}">
+                <div onClick="{{ row.onEdit }}" style="display:flex;flex-direction:column;gap:8px;padding:12px 6px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;border-radius:8px">
+                  <div style="display:flex;align-items:center;gap:10px;min-width:0">
+                    <div style="font-size:12px;color:#7b8497;font-family:'JetBrains Mono',monospace;font-weight:500;flex:none;width:52px">{{ row.dateLabel }}</div>
+                    <div style="min-width:0;flex:1">
+                      <div style="font-size:13.5px;font-weight:600;color:#eef1f6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.desc }}</div>
+                      <div style="font-size:11.5px;color:#5f6776;margin-top:1px">{{ row.accountLabel }}</div>
                     </div>
-                  </sc-if>
-                  <sc-if value="{{ row.isIncome }}">
-                    <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(43,212,125,.12);border:1px solid rgba(43,212,125,.22);border-radius:8px;padding:6px 10px;font-size:12.5px;font-weight:600;color:#2bd47d">
-                      <span style="width:8px;height:8px;border-radius:3px;background:#2bd47d"></span>{{ row.category }}
-                    </span>
-                  </sc-if>
-                  <sc-if value="{{ row.isTransfer }}">
-                    <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;color:#9aa3b2;white-space:nowrap">
-                      <span style="color:#7fb0ff;font-size:13px">⇄</span>{{ row.transferLabel }}
-                    </span>
-                  </sc-if>
+                    <div style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:14px;font-variant-numeric:tabular-nums;flex:none;white-space:nowrap;color:{{ row.amountColor }}">{{ row.amountLabel }}</div>
+                  </div>
+                  <div onClick="{{ stopClick }}" style="padding-left:62px">
+                    <sc-if value="{{ row.isExpense }}">
+                      <div style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:0 8px;height:32px">
+                        <span style="width:8px;height:8px;border-radius:3px;background:{{ row.catColor }};flex:none"></span>
+                        <select value="{{ row.category }}" onChange="{{ row.onRecat }}" style="border:none;background:transparent;color:#cfd5e0;font-size:12.5px;font-weight:600;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none">
+                          <sc-for list="{{ expenseCatOptions }}" as="opt" hint-placeholder-count="8">
+                            <option value="{{ opt }}">{{ opt }}</option>
+                          </sc-for>
+                        </select>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ row.isIncome }}">
+                      <span style="display:inline-flex;align-items:center;gap:7px;background:rgba(43,212,125,.12);border:1px solid rgba(43,212,125,.22);border-radius:8px;padding:6px 10px;font-size:12.5px;font-weight:600;color:#2bd47d">
+                        <span style="width:8px;height:8px;border-radius:3px;background:#2bd47d"></span>{{ row.category }}
+                      </span>
+                    </sc-if>
+                    <sc-if value="{{ row.isTransfer }}">
+                      <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;color:#9aa3b2;white-space:nowrap">
+                        <span style="color:#7fb0ff;font-size:13px">⇄</span>{{ row.transferLabel }}
+                      </span>
+                    </sc-if>
+                  </div>
                 </div>
-              </div>
+              </sc-if>
+
             </sc-for>
             <sc-if value="{{ noRecent }}">
               <div style="padding:48px 0;text-align:center;color:#5f6776;font-size:13.5px">No transactions match your search.</div>
@@ -660,18 +699,6 @@ class Component extends DCLogic {
         amountColor: isXfer ? '#9aa3b2' : isInc ? '#2bd47d' : '#cfd5e0',
         onEdit: () => this.openEdit(t),
         onRecat: (e) => this.recategorize(t.id, e.target.value),
-        rowStyle: {
-          display:'flex', flexDirection: S.isNarrow ? 'column' : 'row',
-          alignItems: S.isNarrow ? 'stretch' : 'center',
-          gap: S.isNarrow ? '8px' : '12px',
-          padding: '12px 6px', borderBottom:'1px solid rgba(255,255,255,.04)',
-          cursor:'pointer', borderRadius:'8px',
-        },
-        catWrapStyle: {
-          width: '100%',
-          paddingLeft: S.isNarrow ? '0' : '62px',
-          marginTop: '2px',
-        },
       };
     });
 
