@@ -499,6 +499,7 @@ class Component extends DCLogic {
     this.setState({ syncing:true });
     fetch(this.API, {
       method:'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload),
     })
       .then(r => r.json())
@@ -521,7 +522,7 @@ class Component extends DCLogic {
   }
 
   monthKey(y,m){ return y + '-' + String(m).padStart(2,'0'); }
-  blankForm(){ return { desc:'', amount:'', category:'Groceries', type:'expense', account:'Bank', from:'Bank', to:'Wallet', date:'2026-06-12' }; }
+  blankForm(){ return { desc:'', amount:'', category:'Groceries', type:'expense', account:'Bank', from:'Bank', to:'Wallet', date:new Date().toISOString().slice(0,10) }; }
 
   changeMonth(d){
     let m = this.state.month + d, y = this.state.year;
