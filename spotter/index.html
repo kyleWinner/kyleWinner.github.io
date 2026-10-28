@@ -1,0 +1,1205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16191d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Spotter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: one phone-width column; picker list -> setup sheet -> full-bleed camera HUD -> set summary. */
+:root {
+  --bg: #f0f1ee;          /* chalk */
+  --surface: #ffffff;
+  --line: #d8dbd6;
+  --ink: #15181b;
+  --muted: #5b6268;
+  --accent: #1d5bc6;      /* competition blue plate */
+  --accent-ink: #ffffff;
+  --good: #1d8a4f;        /* green plate */
+  --warn: #a87f00;        /* yellow plate */
+  --bad: #c92d33;         /* red plate */
+  --chip: #e3e6e1;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16191d; --surface: #1f2328; --line: #30353b; --ink: #eceeea; --muted: #9aa1a8;
+    --accent: #4d8ef5; --accent-ink: #0d1117; --good: #3cc77d; --warn: #f2c230; --bad: #f05a5f; --chip: #272c32;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.45 var(--body); -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- Picker ---------- */
+#picker {
+  max-width: 560px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: calc(env(safe-area-inset-top, 0px) + 20px) calc(env(safe-area-inset-bottom, 0px) + 32px);
+}
+.brand { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.brand h1 {
+  margin: 0; font: 800 44px/0.9 var(--display); letter-spacing: 0.01em; text-transform: uppercase;
+}
+.brand h1 span { color: var(--accent); }
+.brand p { margin: 0; color: var(--muted); font-size: 14px; text-align: right; }
+.search {
+  margin-top: 18px; width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 16px var(--body);
+}
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 12px 0 4px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; border: 0; border-radius: 999px; padding: 7px 14px; background: var(--chip);
+  font: 600 15px var(--display); letter-spacing: 0.06em; text-transform: uppercase;
+}
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.group { margin-top: 18px; }
+.group h2 {
+  margin: 0 0 6px; font: 700 14px var(--display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  display: flex; justify-content: space-between;
+}
+.list { display: grid; border-top: 1px solid var(--line); }
+.row {
+  display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; text-align: left;
+  border: 0; border-bottom: 1px solid var(--line); background: none; padding: 12px 2px;
+}
+.row b { font: 600 20px/1.15 var(--display); letter-spacing: 0.01em; }
+.row small { grid-column: 1; color: var(--muted); font-size: 13.5px; min-width: 0; }
+.row .view { grid-row: 1 / span 2; grid-column: 2; }
+.view {
+  font: 600 12px var(--display); letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap;
+}
+.empty { color: var(--muted); padding: 24px 0; }
+.foot { margin-top: 28px; color: var(--muted); font-size: 13px; }
+
+/* ---------- Setup sheet ---------- */
+.scrim { position: fixed; inset: 0; background: rgba(8, 10, 12, 0.5); z-index: 20; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; margin: 0 auto; max-width: 560px;
+  background: var(--surface); border-radius: 18px 18px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.25);
+  padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px));
+  padding-block: 18px calc(env(safe-area-inset-bottom, 0px) + 20px);
+  display: grid; gap: 14px; max-height: 88vh; overflow-y: auto;
+}
+.sheet h3 { margin: 0; font: 800 34px/1 var(--display); text-transform: uppercase; }
+.sheet .meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+.setup {
+  display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center;
+  background: var(--bg); border-radius: 12px; padding: 12px;
+}
+.setup svg { width: 56px; height: 56px; }
+.setup p { margin: 0; font-size: 15px; }
+.checks { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.checks li { display: flex; gap: 10px; align-items: baseline; font-size: 15px; }
+.checks li::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 2px; background: var(--accent); transform: translateY(-1px); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--chip); border-radius: 10px; padding: 3px; }
+.seg button { border: 0; background: none; padding: 9px; border-radius: 8px; font-weight: 600; font-size: 15px; }
+.seg button[aria-pressed="true"] { background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+.toggle { display: flex; justify-content: space-between; align-items: center; font-size: 15px; }
+.toggle input { width: 22px; height: 22px; accent-color: var(--accent); }
+.btn {
+  border: 0; border-radius: 12px; padding: 15px 18px; font: 700 20px var(--display); letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--chip);
+}
+.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-row .primary { grid-column: 1 / -1; }
+
+/* ---------- Live ---------- */
+#live { position: fixed; inset: 0; background: #0b0d0f; color: #f4f5f2; z-index: 30; overflow: hidden; }
+#live video, #live canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+#live.cover video, #live.cover canvas { object-fit: cover; }
+#live.mirror video, #live.mirror canvas { transform: scaleX(-1); }
+.hud-top {
+  position: absolute; left: 0; right: 0; top: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) max(14px, env(safe-area-inset-right, 0px)) 40px max(14px, env(safe-area-inset-left, 0px));
+  background: linear-gradient(rgba(8,10,12,0.75), rgba(8,10,12,0));
+}
+.hud-name { font: 700 22px/1 var(--display); text-transform: uppercase; letter-spacing: 0.03em; }
+.hud-sub { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+.counter { text-align: right; }
+.counter .big { font: 800 84px/0.8 var(--display); font-variant-numeric: tabular-nums; }
+.counter .lbl { font: 600 13px var(--display); letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.85; margin-top: 6px; }
+.status {
+  position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); width: min(86%, 420px);
+  background: rgba(10,12,14,0.82); border-radius: 14px; padding: 16px 18px; text-align: center; font-size: 16px;
+}
+.status b { display: block; font: 700 22px var(--display); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+.gauge {
+  position: absolute; right: max(14px, env(safe-area-inset-right, 0px)); top: 34%; height: 34%; width: 14px;
+  border-radius: 7px; background: rgba(255,255,255,0.18); overflow: visible;
+}
+.gauge i { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 7px; background: #4d8ef5; height: 0; transition: height 80ms linear; }
+.gauge .tgt { position: absolute; left: -6px; right: -6px; height: 3px; background: #f4f5f2; border-radius: 2px; }
+.gauge.hit i { background: #3cc77d; }
+.gauge-lbl {
+  position: absolute; right: max(36px, calc(env(safe-area-inset-right, 0px) + 36px)); top: calc(34% - 4px);
+  text-align: right; font: 600 13px var(--display); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.gauge-lbl span { display: block; font: 800 30px/1 var(--display); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.cue {
+  position: absolute; left: max(14px, env(safe-area-inset-left, 0px)); right: max(14px, env(safe-area-inset-right, 0px));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 132px);
+  background: #f2c230; color: #15181b; border-radius: 12px; padding: 12px 14px;
+  font: 700 22px/1.1 var(--display); letter-spacing: 0.01em; transition: opacity 250ms, transform 250ms;
+}
+.cue.good { background: #3cc77d; }
+.cue.fade { opacity: 0; transform: translateY(8px); }
+.hud-bottom {
+  position: absolute; left: 0; right: 0; bottom: 0; display: grid; gap: 12px;
+  padding: 40px max(14px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 14px) max(14px, env(safe-area-inset-left, 0px));
+  background: linear-gradient(rgba(8,10,12,0), rgba(8,10,12,0.8));
+}
+.dots { display: flex; gap: 6px; flex-wrap: wrap; min-height: 14px; }
+.dots i { width: 14px; height: 14px; border-radius: 3px; background: #3cc77d; }
+.dots i.f { background: #f2c230; }
+.dots i.p { background: transparent; border: 2px solid rgba(255,255,255,0.5); }
+.controls { display: grid; grid-template-columns: auto auto 1fr; gap: 10px; }
+.ctl {
+  border: 0; border-radius: 12px; background: rgba(255,255,255,0.14); color: #f4f5f2; padding: 12px 14px;
+  font: 600 15px var(--body); display: flex; align-items: center; gap: 8px;
+}
+.ctl svg { width: 20px; height: 20px; }
+.ctl.end { justify-content: center; background: #f4f5f2; color: #15181b; font: 700 19px var(--display); letter-spacing: 0.06em; text-transform: uppercase; }
+.ctl[aria-pressed="false"] { opacity: 0.6; }
+
+/* ---------- Summary ---------- */
+#summary {
+  max-width: 560px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: calc(env(safe-area-inset-top, 0px) + 20px) calc(env(safe-area-inset-bottom, 0px) + 32px);
+  display: grid; gap: 22px;
+}
+.sum-head small { font: 700 14px var(--display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.sum-head h2 { margin: 2px 0 0; font: 800 38px/1 var(--display); text-transform: uppercase; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.stats div { background: var(--surface); padding: 12px; }
+.stats b { display: block; font: 800 40px/1 var(--display); font-variant-numeric: tabular-nums; }
+.stats span { font-size: 13px; color: var(--muted); }
+.stats .clean b { color: var(--good); }
+.issues h3, .replist h3 { margin: 0 0 8px; font: 700 14px var(--display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.issue { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.issue .bar { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--chip); overflow: hidden; }
+.issue .bar i { display: block; height: 100%; background: var(--warn); }
+.issue b { font-weight: 600; }
+.issue span { color: var(--muted); font-size: 14px; }
+.allgood { padding: 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.allgood b { color: var(--good); }
+.reps { display: flex; flex-wrap: wrap; gap: 6px; }
+.reps span { font: 700 15px var(--display); padding: 4px 9px; border-radius: 6px; background: var(--chip); }
+.reps span.ok { background: color-mix(in srgb, var(--good) 22%, transparent); }
+.reps span.bad { background: color-mix(in srgb, var(--warn) 26%, transparent); }
+.note { font-size: 13.5px; color: var(--muted); margin: 0; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<main id="picker">
+  <header class="brand">
+    <h1>Spot<span>ter</span></h1>
+    <p>Live form checks<br>for <span class="num" id="count">50</span> lifts</p>
+  </header>
+  <input id="q" class="search" type="search" placeholder="Search exercises" autocomplete="off" aria-label="Search exercises">
+  <nav class="chips" id="chips" aria-label="Categories"></nav>
+  <div id="groups"></div>
+  <p class="foot">Pose tracking runs on your phone; no video leaves the device. Cues are a second pair of eyes, not a coach. If something hurts, stop and get it looked at.</p>
+</main>
+
+<div class="scrim" id="scrim" hidden></div>
+<section class="sheet" id="sheet" hidden aria-modal="true" role="dialog" aria-labelledby="sh-name">
+  <div>
+    <h3 id="sh-name">Back squat</h3>
+    <div class="meta"><span class="view" id="sh-view">Side view</span><span id="sh-cat">Legs</span></div>
+  </div>
+  <div class="setup">
+    <svg id="sh-icon" viewBox="0 0 56 56" aria-hidden="true"></svg>
+    <p id="sh-setup"></p>
+  </div>
+  <div>
+    <ul class="checks" id="sh-checks"></ul>
+  </div>
+  <div class="seg" role="group" aria-label="Camera">
+    <button id="cam-back" aria-pressed="true">Rear camera</button>
+    <button id="cam-front" aria-pressed="false">Front camera</button>
+  </div>
+  <label class="toggle">Speak cues and rep counts <input type="checkbox" id="opt-voice" checked></label>
+  <label class="toggle">High-accuracy tracking (slower phones may lag) <input type="checkbox" id="opt-accurate"></label>
+  <div class="btn-row">
+    <button class="btn primary" id="go">Start camera</button>
+    <button class="btn" id="vid-btn">Analyse a video</button>
+    <button class="btn" id="cancel">Back</button>
+  </div>
+  <input type="file" id="vid-file" accept="video/*" hidden>
+</section>
+
+<section id="live" hidden>
+  <video id="video" playsinline muted></video>
+  <canvas id="canvas"></canvas>
+  <div class="hud-top">
+    <div>
+      <div class="hud-name" id="l-name">Back squat</div>
+      <div class="hud-sub" id="l-sub">Set 1</div>
+    </div>
+    <div class="counter">
+      <div class="big" id="l-count">0</div>
+      <div class="lbl" id="l-lbl">reps</div>
+    </div>
+  </div>
+  <div class="gauge" id="gauge" hidden><i id="gauge-fill"></i><div class="tgt" id="gauge-tgt"></div></div>
+  <div class="gauge-lbl" id="gauge-lbl" hidden>Knee<span id="gauge-val">—</span></div>
+  <div class="status" id="status"><b>Loading</b><span>Starting the camera…</span></div>
+  <div class="cue fade" id="cue" aria-live="polite"></div>
+  <div class="hud-bottom">
+    <div class="dots" id="dots"></div>
+    <div class="controls">
+      <button class="ctl" id="l-voice" aria-pressed="true" aria-label="Voice cues">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+      </button>
+      <button class="ctl" id="l-flip" aria-label="Switch camera">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3l-2-3H9L7 7H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1z"/><path d="M9 13a3 3 0 0 1 5-2.2M15 13a3 3 0 0 1-5 2.2"/><path d="M14 9v2h-2M10 17v-2h2"/></svg>
+      </button>
+      <button class="ctl end" id="l-end">Finish set</button>
+    </div>
+  </div>
+</section>
+
+<main id="summary" hidden>
+  <div class="sum-head"><small id="s-set">Set 1</small><h2 id="s-name">Back squat</h2></div>
+  <div class="stats" id="s-stats"></div>
+  <div class="issues" id="s-issues"></div>
+  <div class="replist" id="s-replist"></div>
+  <div class="btn-row">
+    <button class="btn primary" id="s-again">Next set</button>
+    <button class="btn" id="s-change">Change exercise</button>
+    <button class="btn" id="s-video">Analyse a video</button>
+  </div>
+  <p class="note">Reps are counted from joint angles, so very fast or partly hidden movements can be missed. Check the camera angle if counts look off.</p>
+</main>
+
+<script>
+// ===== Spotter engine: metrics, exercises, rep tracking =====
+// Pure logic, no DOM. Landmarks come in as [{x, y, v}] in pixel units
+// (x and y on the same scale so angles are true), indices per MediaPipe Pose.
+
+const IDX = {
+  l: { ear: 7, sh: 11, el: 13, wr: 15, hip: 23, kn: 25, an: 27, he: 29, ft: 31 },
+  r: { ear: 8, sh: 12, el: 14, wr: 16, hip: 24, kn: 26, an: 28, he: 30, ft: 32 },
+};
+
+function ang(a, b, c) {
+  const ax = a.x - b.x, ay = a.y - b.y, cx = c.x - b.x, cy = c.y - b.y;
+  const d = Math.hypot(ax, ay) * Math.hypot(cx, cy);
+  if (!d) return null;
+  const cos = Math.max(-1, Math.min(1, (ax * cx + ay * cy) / d));
+  return (Math.acos(cos) * 180) / Math.PI;
+}
+// Angle of the bottom->top segment away from vertical: 0 = top straight above, 90 = horizontal.
+function fromVert(top, bot) {
+  return (Math.atan2(Math.abs(top.x - bot.x), bot.y - top.y) * 180) / Math.PI;
+}
+const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, v: Math.min(a.v, b.v) });
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const pair = (a, b, f) => (a == null || b == null ? null : f(a, b));
+
+function pickSide(P) {
+  const s = (k) => ['sh', 'el', 'hip', 'kn', 'an'].reduce((t, n) => t + (P[IDX[k][n]].v || 0), 0);
+  return s('l') >= s('r') ? 'l' : 'r';
+}
+
+function computeMetrics(P) {
+  const side = pickSide(P);
+  const S = {}, Lm = {}, Rm = {};
+  for (const k in IDX.l) { Lm[k] = P[IDX.l[k]]; Rm[k] = P[IDX.r[k]]; S[k] = side === 'l' ? Lm[k] : Rm[k]; }
+  const m = { side };
+  const kneeL = ang(Lm.hip, Lm.kn, Lm.an), kneeR = ang(Rm.hip, Rm.kn, Rm.an);
+  const elL = ang(Lm.sh, Lm.el, Lm.wr), elR = ang(Rm.sh, Rm.el, Rm.wr);
+  const shL = ang(Lm.hip, Lm.sh, Lm.el), shR = ang(Rm.hip, Rm.sh, Rm.el);
+  const hipL = ang(Lm.sh, Lm.hip, Lm.kn), hipR = ang(Rm.sh, Rm.hip, Rm.kn);
+
+  m.knee = side === 'l' ? kneeL : kneeR;
+  m.kneeMin = pair(kneeL, kneeR, Math.min);
+  m.kneeMax = pair(kneeL, kneeR, Math.max);
+  m.kneeAvg = pair(kneeL, kneeR, (a, b) => (a + b) / 2);
+  m.kneeDiff = pair(kneeL, kneeR, (a, b) => Math.abs(a - b));
+  m.elbow = side === 'l' ? elL : elR;
+  m.elbowMin = pair(elL, elR, Math.min);
+  m.elbowAvg = pair(elL, elR, (a, b) => (a + b) / 2);
+  m.elbowDiff = pair(elL, elR, (a, b) => Math.abs(a - b));
+  m.sh = side === 'l' ? shL : shR;
+  m.shMax = pair(shL, shR, Math.max);
+  m.shAvg = pair(shL, shR, (a, b) => (a + b) / 2);
+  m.shDiff = pair(shL, shR, (a, b) => Math.abs(a - b));
+  m.hip = side === 'l' ? hipL : hipR;
+  m.hipMin = pair(hipL, hipR, Math.min);
+
+  m.lean = fromVert(S.sh, S.hip);
+  const shMid = mid(Lm.sh, Rm.sh), hipMid = mid(Lm.hip, Rm.hip), anMid = mid(Lm.an, Rm.an);
+  m.leanMid = fromVert(shMid, hipMid);
+  m.neck = ang(S.ear, S.sh, S.hip);
+  m.bodyLine = ang(S.sh, S.hip, S.an);
+
+  // Hip offset from the shoulder-ankle line, as a fraction of body length.
+  // Positive = hips below the line (sagging), negative = above (piking). Only when body is roughly horizontal.
+  const len = dist(S.sh, S.an), dx = S.an.x - S.sh.x;
+  if (len && Math.abs(dx) > 0.5 * len) {
+    const yLine = S.sh.y + ((S.an.y - S.sh.y) * (S.hip.x - S.sh.x)) / dx;
+    m.hipOffset = (S.hip.y - yLine) / len;
+  } else m.hipOffset = 0;
+
+  m.forearm = fromVert(S.wr, S.el);
+  const ankDx = Math.abs(Lm.an.x - Rm.an.x);
+  m.valgus = ankDx > 1 ? Math.abs(Lm.kn.x - Rm.kn.x) / ankDx : null;
+  const shW = dist(Lm.sh, Rm.sh);
+  m.hipShift = shW > 1 ? Math.abs(hipMid.x - anMid.x) / shW : null;
+  const shin = dist(S.kn, S.an);
+  m.heel = shin ? (S.ft.y - S.he.y) / shin : null;
+  const thigh = dist(S.hip, S.kn);
+  m.barDrift = thigh ? Math.abs(S.wr.x - (S.an.x + S.ft.x) / 2) / thigh : null;
+  m.shrug = shW > 1 ? (shMid.y - mid(Lm.ear, Rm.ear).y) / shW : null;
+  return m;
+}
+
+// ---------- Exercise library ----------
+const C = (when, test, cue) => ({ when, test, cue });
+const range = (k, amt, cue) => C('rep', (m, st) => st.max[k] != null && st.max[k] - st.min[k] > amt, cue);
+const neck = C('move', (m) => m.neck < 140, 'Keep your head in line with your spine');
+const heels = C('move', (m) => m.heel > 0.15, 'Keep your heels down');
+
+const SETUP = {
+  side: 'Stand side-on to the phone, 2–3 m away, camera at hip height. Get your whole body in frame.',
+  front: 'Face the phone, 2–3 m away, camera at hip height. Get your whole body in frame.',
+  bench: 'Put the phone beside the bench at bench height, side-on to you, so your arms and torso are in frame.',
+  machine: 'Put the phone side-on to the machine at seat height, so your hips, knees and feet are in frame.',
+  floor: 'Put the phone on the floor 2 m away, side-on to you, so your whole body is in frame.',
+  hang: 'Put the phone 2–3 m away so your arms, hands and hips are in frame at the top of the rep.',
+};
+
+const squat = (o) => ({ cat: 'Legs', view: 'side', need: 'legs',
+  rep: { m: 'knee', rest: 155, target: 100, partial: 'Go deeper — get your hips down to knee height', lockout: 'Stand all the way up between reps' }, ...o });
+const benchLike = (o) => ({ cat: 'Push', view: 'side', need: 'arms', setup: 'bench', focus: 'Depth · wrist stack · lockout',
+  rep: { m: 'elbow', rest: 155, target: 95, partial: 'Bring the weight all the way down to your chest', lockout: 'Press to full lockout' },
+  checks: [C('target', (m) => m.forearm > 25, 'Stack your wrists over your elbows'), range('hip', 15, 'Keep your hips on the bench')], ...o });
+const curl = (o) => ({ cat: 'Arms', view: 'side', need: 'arms', minRep: 1.0, focus: 'Elbow position · swing · full range',
+  rep: { m: 'elbowMin', rest: 150, target: 65, partial: 'Curl all the way up', lockout: 'Lower all the way down' },
+  checks: [C('move', (m) => m.shMax > 35, 'Pin your elbows to your sides'), range('lean', 10, 'Don’t swing — keep your back still')], ...o });
+const pull = (o) => ({ cat: 'Pull', view: 'front', need: 'arms', setup: 'hang', focus: 'Full range · even pull',
+  rep: { m: 'elbowAvg', rest: 150, target: 85, partial: 'Pull until your chin clears the bar', lockout: 'Lower to a full hang between reps' },
+  checks: [C('move', (m) => m.elbowDiff > 22, 'Pull evenly with both arms')], ...o });
+const press = (o) => ({ cat: 'Push', view: 'front', need: 'arms', focus: 'Lockout · even arms · upright torso',
+  rep: { m: 'elbowAvg', rest: 85, target: 155, partial: 'Press all the way to lockout', lockout: 'Lower the weights back to shoulder height' },
+  checks: [C('move', (m) => m.elbowDiff > 22, 'Press evenly with both arms'), C('any', (m) => m.leanMid > 12, 'Stay stacked — don’t lean to one side')], ...o });
+
+const EXERCISES = [
+  // Legs
+  squat({ id: 'back-squat', name: 'Back squat', focus: 'Depth · chest angle · heels',
+    checks: [C('target', (m) => m.lean > 55, 'Chest up — you’re folding forward'), heels, neck] }),
+  squat({ id: 'front-squat', name: 'Front squat', focus: 'Depth · upright torso · heels',
+    checks: [C('target', (m) => m.lean > 40, 'Elbows up and stay tall'), heels] }),
+  squat({ id: 'goblet-squat', name: 'Goblet squat', focus: 'Depth · upright torso',
+    checks: [C('target', (m) => m.lean > 45, 'Chest up, keep the weight close'), heels] }),
+  squat({ id: 'air-squat', name: 'Bodyweight squat', focus: 'Depth · chest angle · heels',
+    rep: { m: 'knee', rest: 155, target: 95, partial: 'Go deeper — hips to knee height or below', lockout: 'Stand all the way up between reps' },
+    checks: [C('target', (m) => m.lean > 50, 'Chest up — sit between your heels'), heels] }),
+  squat({ id: 'box-squat', name: 'Box squat', focus: 'Depth · chest angle · heels',
+    rep: { m: 'knee', rest: 155, target: 100, partial: 'Sit back until you touch the box', lockout: 'Stand all the way up between reps' },
+    checks: [C('target', (m) => m.lean > 50, 'Chest up as you sit back'), heels] }),
+  squat({ id: 'sumo-squat', name: 'Sumo squat', view: 'front', focus: 'Knees out · even depth · balance',
+    rep: { m: 'kneeAvg', rest: 155, target: 105, partial: 'Sit deeper — thighs towards parallel', lockout: 'Stand all the way up between reps' },
+    checks: [C('target', (m) => m.valgus < 0.8, 'Push your knees out over your toes'),
+      C('move', (m) => m.hipShift > 0.25, 'Keep your weight centred'),
+      C('target', (m) => m.kneeDiff > 18, 'Sit down evenly through both legs')] }),
+  squat({ id: 'bulgarian-split-squat', name: 'Bulgarian split squat', focus: 'Depth · torso angle',
+    rep: { m: 'kneeMin', rest: 150, target: 100, partial: 'Lower until your front thigh is near parallel', lockout: 'Drive all the way back up' },
+    checks: [C('target', (m) => m.lean > 40, 'Keep your torso fairly upright')] }),
+  squat({ id: 'forward-lunge', name: 'Forward lunge', focus: 'Depth · upright torso',
+    rep: { m: 'kneeMin', rest: 155, target: 100, partial: 'Drop your back knee closer to the floor', lockout: 'Push all the way back to standing' },
+    checks: [C('target', (m) => m.lean > 25, 'Keep your torso upright')] }),
+  squat({ id: 'reverse-lunge', name: 'Reverse lunge', focus: 'Depth · upright torso',
+    rep: { m: 'kneeMin', rest: 155, target: 100, partial: 'Drop your back knee closer to the floor', lockout: 'Return all the way to standing' },
+    checks: [C('target', (m) => m.lean > 30, 'Keep your torso upright')] }),
+  squat({ id: 'lateral-lunge', name: 'Lateral lunge', view: 'front', focus: 'Depth · chest up · straight trailing leg',
+    rep: { m: 'kneeMin', rest: 155, target: 110, partial: 'Sit deeper into the working hip', lockout: 'Push back to standing' },
+    checks: [C('target', (m) => m.leanMid > 40, 'Sit back into the hip and keep your chest up'),
+      C('target', (m) => m.kneeMax < 150, 'Keep the trailing leg straight')] }),
+  squat({ id: 'leg-press', name: 'Leg press', setup: 'machine', focus: 'Depth · lower back · knee lock',
+    rep: { m: 'knee', rest: 155, target: 95, partial: 'Lower the sled until your knees reach about 90°', lockout: 'Press back up to a soft lockout' },
+    checks: [C('target', (m) => m.hip < 55, 'Too deep — your lower back is lifting off the pad'),
+      C('rest', (m) => m.knee > 176, 'Keep a micro-bend — don’t snap your knees locked')] }),
+  { id: 'calf-raise', name: 'Standing calf raise', cat: 'Legs', view: 'side', need: 'legs', minRep: 1.0, focus: 'Full height · straight legs',
+    rep: { m: 'heel', rel: true, delta: 0.1, partial: 'Rise all the way onto your toes', lockout: 'Lower your heels fully between reps' },
+    checks: [C('move', (m) => m.knee < 155, 'Keep your legs straight — drive through the balls of your feet')] },
+  { id: 'wall-sit', name: 'Wall sit', cat: 'Legs', view: 'side', need: 'legs', focus: 'Knee angle · flat back',
+    hold: { valid: (m) => m.knee < 125 && m.lean < 35, invalid: 'Slide down the wall until your thighs are near parallel' },
+    checks: [C('hold', (m) => m.knee > 110, 'Slide lower — thighs parallel to the floor'),
+      C('hold', (m) => m.knee < 70, 'Too low — come up to about 90° at the knee'),
+      C('hold', (m) => m.lean > 20, 'Press your back flat against the wall')] },
+  { id: 'leg-extension', name: 'Leg extension', cat: 'Legs', view: 'side', need: 'legs', setup: 'machine', minRep: 1.2, focus: 'Full extension · hips down',
+    rep: { m: 'knee', rest: 100, target: 165, partial: 'Extend fully and squeeze at the top', lockout: 'Lower under control all the way' },
+    checks: [range('hip', 15, 'Keep your hips down on the seat')] },
+
+  // Hinge
+  { id: 'deadlift', name: 'Conventional deadlift', cat: 'Hinge', view: 'side', need: 'all', minRep: 0.8, focus: 'Bar path · hip timing · neck · lockout',
+    rep: { m: 'hip', rest: 165, target: 115, partial: 'Lower the bar all the way to the floor', lockout: 'Finish tall — squeeze your glutes to lock out' },
+    checks: [C('move', (m) => m.barDrift > 0.4, 'Keep the bar close — drag it up your legs'),
+      C('move', (m) => m.knee > 165 && m.hip < 125, 'Hips shot up — push the floor away with your legs'), neck] },
+  { id: 'sumo-deadlift', name: 'Sumo deadlift', cat: 'Hinge', view: 'front', need: 'legs', minRep: 0.8, focus: 'Knees out · balance · lockout',
+    rep: { m: 'kneeAvg', rest: 160, target: 125, partial: 'Lower the bar all the way to the floor', lockout: 'Finish tall — squeeze your glutes to lock out' },
+    checks: [C('move', (m) => m.valgus < 0.85, 'Push your knees out'), C('move', (m) => m.hipShift > 0.25, 'Keep your weight centred'),
+      C('move', (m) => m.kneeDiff > 18, 'Drive evenly through both legs')] },
+  { id: 'romanian-deadlift', name: 'Romanian deadlift', cat: 'Hinge', view: 'side', need: 'all', focus: 'Hip hinge · soft knees · bar path',
+    rep: { m: 'hip', rest: 165, target: 110, partial: 'Hinge further — push your hips back until you feel your hamstrings', lockout: 'Stand tall at the top' },
+    checks: [C('move', (m) => m.knee < 135, 'Soft knees only — push your hips back, don’t squat'),
+      C('move', (m) => m.barDrift > 0.4, 'Keep the weight close to your legs'), neck] },
+  { id: 'single-leg-rdl', name: 'Single-leg RDL', cat: 'Hinge', view: 'side', need: 'legs', minRep: 1.0, focus: 'Hinge depth · standing knee',
+    rep: { m: 'hipMin', rest: 160, target: 115, partial: 'Hinge further — reach the back leg out behind you', lockout: 'Stand all the way up' },
+    checks: [C('move', (m) => m.kneeMax < 140, 'Keep the standing knee soft but stable')] },
+  { id: 'good-morning', name: 'Good morning', cat: 'Hinge', view: 'side', need: 'legs', focus: 'Hinge depth · knees · neck',
+    rep: { m: 'hip', rest: 165, target: 115, partial: 'Hinge further — push your hips back', lockout: 'Stand all the way up' },
+    checks: [C('move', (m) => m.knee < 140, 'Keep the knees soft, not bent'), neck] },
+  { id: 'hip-thrust', name: 'Hip thrust', cat: 'Hinge', view: 'side', need: 'legs', setup: 'bench', focus: 'Full extension · foot position',
+    rep: { m: 'hip', rest: 120, target: 168, partial: 'Drive to full hip extension — squeeze at the top', lockout: 'Lower your hips fully between reps' },
+    checks: [C('target', (m) => m.knee > 115, 'Feet are too far out — bring them closer'),
+      C('target', (m) => m.knee < 65, 'Feet are too close — move them out')] },
+  { id: 'glute-bridge', name: 'Glute bridge', cat: 'Hinge', view: 'side', need: 'legs', setup: 'floor', focus: 'Full extension · foot position',
+    rep: { m: 'hip', rest: 135, target: 165, partial: 'Lift your hips higher — squeeze at the top', lockout: 'Lower your hips to the floor between reps' },
+    checks: [C('target', (m) => m.knee > 115, 'Feet are too far out — bring them closer'),
+      C('target', (m) => m.knee < 65, 'Feet are too close — move them out')] },
+  { id: 'kettlebell-swing', name: 'Kettlebell swing', cat: 'Hinge', view: 'side', need: 'all', minRep: 0, focus: 'Hinge not squat · hip snap',
+    rep: { m: 'hip', rest: 160, target: 115, partial: 'Hinge deeper — hike the bell back between your legs', lockout: 'Snap your hips through to stand tall' },
+    checks: [C('target', (m) => m.knee < 120, 'Hinge, don’t squat — less knee bend')] },
+
+  // Push
+  benchLike({ id: 'bench-press', name: 'Bench press' }),
+  benchLike({ id: 'incline-bench', name: 'Incline bench press' }),
+  benchLike({ id: 'dumbbell-bench', name: 'Dumbbell bench press' }),
+  benchLike({ id: 'close-grip-bench', name: 'Close-grip bench press' }),
+  { id: 'push-up', name: 'Push-up', cat: 'Push', view: 'side', need: 'all', setup: 'floor', focus: 'Depth · straight body · neck',
+    rep: { m: 'elbow', rest: 155, target: 95, partial: 'Lower until your chest nearly touches the floor', lockout: 'Push all the way up' },
+    checks: [C('any', (m) => m.hipOffset > 0.07, 'Hips sagging — brace your core and squeeze your glutes'),
+      C('any', (m) => m.hipOffset < -0.09, 'Hips too high — make a straight line from head to heels'),
+      C('move', (m) => m.neck < 145, 'Keep your head in line — don’t drop your chin')] },
+  { id: 'overhead-press', name: 'Overhead press', cat: 'Push', view: 'side', need: 'arms', focus: 'Lockout · bar over head · no lean back',
+    rep: { m: 'elbow', rest: 85, target: 160, partial: 'Press all the way to lockout overhead', lockout: 'Bring the bar back down to your shoulders' },
+    checks: [C('target', (m) => m.sh < 150, 'Finish with the bar over your head, not out in front'),
+      C('any', (m) => m.lean > 15, 'Don’t lean back — squeeze your glutes and brace')] },
+  press({ id: 'dumbbell-shoulder-press', name: 'Dumbbell shoulder press' }),
+  press({ id: 'arnold-press', name: 'Arnold press' }),
+  { id: 'dip', name: 'Dip', cat: 'Push', view: 'side', need: 'arms', setup: 'hang', focus: 'Depth · shoulder safety · lockout',
+    rep: { m: 'elbow', rest: 155, target: 95, partial: 'Lower until your upper arms are parallel to the floor', lockout: 'Press to full lockout at the top' },
+    checks: [C('target', (m) => m.elbow < 65, 'Too deep — stop at about 90° to protect your shoulders')] },
+  { id: 'lateral-raise', name: 'Lateral raise', cat: 'Push', view: 'front', need: 'arms', minRep: 1.0, focus: 'Height · even arms · no shrug or swing',
+    rep: { m: 'shAvg', rest: 25, target: 80, partial: 'Raise to shoulder height', lockout: 'Lower all the way under control' },
+    checks: [C('move', (m) => m.shAvg > 105, 'Stop at shoulder height'),
+      C('move', (m) => m.elbowAvg < 130, 'Keep your arms long with a slight bend'),
+      C('move', (m) => m.shDiff > 18, 'Raise both arms evenly'),
+      range('shrug', 0.12, 'Keep your shoulders down — don’t shrug'),
+      range('leanMid', 8, 'No swinging — try a lighter weight')] },
+  { id: 'front-raise', name: 'Front raise', cat: 'Push', view: 'side', need: 'arms', minRep: 1.0, focus: 'Height · no swing',
+    rep: { m: 'sh', rest: 25, target: 80, partial: 'Raise to shoulder height', lockout: 'Lower all the way under control' },
+    checks: [C('move', (m) => m.sh > 110, 'Stop at shoulder height'), range('lean', 10, 'No swinging — try a lighter weight')] },
+  { id: 'pike-push-up', name: 'Pike push-up', cat: 'Push', view: 'side', need: 'all', setup: 'floor', focus: 'Depth · hip height',
+    rep: { m: 'elbow', rest: 155, target: 100, partial: 'Lower your head closer to the floor', lockout: 'Push all the way up' },
+    checks: [C('move', (m) => m.hip > 125, 'Get your hips higher — make an upside-down V')] },
+
+  // Pull
+  pull({ id: 'pull-up', name: 'Pull-up' }),
+  pull({ id: 'chin-up', name: 'Chin-up' }),
+  { id: 'lat-pulldown', name: 'Lat pulldown', cat: 'Pull', view: 'side', need: 'arms', focus: 'Full range · torso still',
+    rep: { m: 'elbow', rest: 150, target: 85, partial: 'Pull the bar down to your upper chest', lockout: 'Let your arms extend fully at the top' },
+    checks: [range('lean', 15, 'Keep your torso still — don’t rock back'), C('any', (m) => m.lean > 30, 'Lean back only slightly')] },
+  { id: 'barbell-row', name: 'Bent-over barbell row', cat: 'Pull', view: 'side', need: 'all', focus: 'Torso angle · no heaving · neck',
+    rep: { m: 'elbow', rest: 150, target: 90, partial: 'Row the bar all the way to your stomach', lockout: 'Let your arms extend fully' },
+    checks: [C('move', (m) => m.lean < 35, 'Hinge over more — aim for a 45° torso or lower'),
+      range('lean', 15, 'Keep your torso still — don’t heave the weight'), neck] },
+  { id: 'dumbbell-row', name: 'One-arm dumbbell row', cat: 'Pull', view: 'side', need: 'arms', focus: 'Full range · no twisting',
+    rep: { m: 'elbowMin', rest: 150, target: 90, partial: 'Row the dumbbell up to your hip', lockout: 'Let your arm extend fully' },
+    checks: [range('lean', 12, 'Keep your torso still — don’t twist or heave')] },
+  { id: 'seated-cable-row', name: 'Seated cable row', cat: 'Pull', view: 'side', need: 'arms', setup: 'machine', focus: 'Full range · torso still',
+    rep: { m: 'elbow', rest: 150, target: 90, partial: 'Pull the handle all the way to your stomach', lockout: 'Let your arms extend fully' },
+    checks: [range('lean', 22, 'Keep your torso still — pull with your back'),
+      C('target', (m) => m.lean > 25, 'Don’t lean back to finish the rep')] },
+  { id: 'face-pull', name: 'Face pull', cat: 'Pull', view: 'side', need: 'arms', minRep: 1.0, focus: 'Elbows high · torso still',
+    rep: { m: 'elbow', rest: 155, target: 85, partial: 'Pull the rope all the way to your face', lockout: 'Let your arms extend fully' },
+    checks: [C('target', (m) => m.sh < 65, 'Keep your elbows high — level with your shoulders'), range('lean', 12, 'Keep your torso still')] },
+  { id: 'shrug', name: 'Shrug', cat: 'Pull', view: 'front', need: 'arms', minRep: 1.0, focus: 'Full height · straight arms',
+    rep: { m: 'shrug', rel: true, delta: -0.1, partial: 'Shrug higher — shoulders to ears', lockout: 'Lower your shoulders fully between reps' },
+    checks: [C('move', (m) => m.elbowAvg < 150, 'Keep your arms straight — no curling')] },
+
+  // Arms
+  curl({ id: 'barbell-curl', name: 'Barbell curl', rep: { m: 'elbow', rest: 150, target: 65, partial: 'Curl all the way up', lockout: 'Lower all the way down' },
+    checks: [C('move', (m) => m.sh > 30, 'Pin your elbows to your sides'), range('lean', 10, 'Don’t swing — keep your back still')] }),
+  curl({ id: 'dumbbell-curl', name: 'Dumbbell curl' }),
+  curl({ id: 'hammer-curl', name: 'Hammer curl' }),
+  { id: 'tricep-pushdown', name: 'Tricep pushdown', cat: 'Arms', view: 'side', need: 'arms', minRep: 1.0, focus: 'Elbows tucked · lockout',
+    rep: { m: 'elbow', rest: 75, target: 160, partial: 'Push down to full lockout', lockout: 'Let the handle come back up to about 90°' },
+    checks: [C('move', (m) => m.sh > 35, 'Keep your elbows tucked at your sides'), range('lean', 10, 'Keep your torso still')] },
+  { id: 'overhead-tricep-extension', name: 'Overhead tricep extension', cat: 'Arms', view: 'side', need: 'arms', minRep: 1.0, focus: 'Elbows up · lockout · no arch',
+    rep: { m: 'elbow', rest: 70, target: 155, partial: 'Extend all the way to lockout', lockout: 'Lower the weight fully behind your head' },
+    checks: [C('move', (m) => m.sh < 130, 'Keep your elbows pointing up'), C('any', (m) => m.lean > 15, 'Brace — don’t arch your lower back')] },
+
+  // Core
+  { id: 'plank', name: 'Plank', cat: 'Core', view: 'side', need: 'all', setup: 'floor', focus: 'Straight line · neck',
+    hold: { valid: (m) => m.lean > 55, invalid: 'Get into your plank, side-on to the camera' },
+    checks: [C('hold', (m) => m.hipOffset > 0.06, 'Hips sagging — brace and squeeze your glutes'),
+      C('hold', (m) => m.hipOffset < -0.08, 'Hips too high — flatten into a straight line'),
+      C('hold', (m) => m.neck < 145, 'Keep your head in line with your spine')] },
+  { id: 'sit-up', name: 'Sit-up', cat: 'Core', view: 'side', need: 'legs', setup: 'floor', minRep: 1.0, focus: 'Full range · neck',
+    rep: { m: 'hip', rest: 115, target: 70, partial: 'Sit all the way up', lockout: 'Lower all the way back down' },
+    checks: [C('move', (m) => m.neck < 110, 'Don’t pull on your neck — lead with your chest')] },
+  { id: 'hanging-leg-raise', name: 'Hanging leg raise', cat: 'Core', view: 'side', need: 'legs', setup: 'hang', minRep: 1.2, focus: 'Height · no swing',
+    rep: { m: 'hip', rest: 155, target: 105, partial: 'Raise your legs to hip height', lockout: 'Lower all the way down under control' },
+    checks: [range('lean', 20, 'Control the swing — no kipping')] },
+];
+
+const NEED = { legs: ['sh', 'hip', 'kn', 'an'], arms: ['sh', 'el', 'wr', 'hip'], all: ['sh', 'el', 'wr', 'hip', 'kn', 'an'] };
+const NEED_LABEL = { legs: 'hips, knees and feet', arms: 'shoulders, arms and hips', all: 'whole body' };
+const METRIC_LABEL = { knee: 'Knee', kneeMin: 'Front knee', kneeAvg: 'Knees', hip: 'Hip', hipMin: 'Hip', elbow: 'Elbow',
+  elbowMin: 'Elbow', elbowAvg: 'Elbows', sh: 'Arm', shAvg: 'Arms', heel: 'Heel lift', shrug: 'Shrug' };
+
+function visibleEnough(P, ex, side) {
+  const parts = NEED[ex.need || 'all'];
+  const sides = ex.view === 'front' ? ['l', 'r'] : [side];
+  return sides.every((s) => parts.every((k) => (P[IDX[s][k]].v || 0) > 0.5));
+}
+
+// ---------- Session: rep state machine + check evaluation ----------
+class Session {
+  constructor(ex) {
+    this.ex = ex;
+    this.reps = [];
+    this.partials = 0;
+    this.tally = new Map(); // cue -> count
+    this.state = 'idle';
+    this.smooth = {};
+    this.debounce = new Map();
+    this.anyFlagged = new Set();
+    this.cur = null;
+    this.p = 0;
+    this.hold = { total: 0, good: 0, last: null };
+    this.calib = ex.rep && ex.rep.rel ? [] : null;
+    this.restV = ex.rep ? ex.rep.rest : null;
+    this.targetV = ex.rep ? ex.rep.target : null;
+    this.activeFaults = new Set();
+  }
+
+  get calibrating() { return this.calib !== null; }
+
+  _smoothed(m) {
+    const out = {};
+    for (const k in m) {
+      const v = m[k];
+      if (typeof v !== 'number' || !isFinite(v)) { out[k] = v; continue; }
+      const prev = this.smooth[k];
+      out[k] = this.smooth[k] = prev == null ? v : prev * 0.45 + v * 0.55;
+    }
+    return out;
+  }
+
+  _beginRep(t) {
+    this.cur = { start: t, faults: new Set(), min: {}, max: {} };
+  }
+
+  _track(m) {
+    if (!this.cur) return;
+    for (const k in m) {
+      const v = m[k];
+      if (typeof v !== 'number' || !isFinite(v)) continue;
+      if (this.cur.min[k] == null || v < this.cur.min[k]) this.cur.min[k] = v;
+      if (this.cur.max[k] == null || v > this.cur.max[k]) this.cur.max[k] = v;
+    }
+  }
+
+  _flag(cue, events) {
+    if (this.cur) {
+      if (this.cur.faults.has(cue)) return;
+      this.cur.faults.add(cue);
+    }
+    this.tally.set(cue, (this.tally.get(cue) || 0) + 1);
+    events.push({ type: 'cue', text: cue });
+  }
+
+  _finishRep(t, events, extra) {
+    const rep = this.cur || { start: t, faults: new Set(), min: {}, max: {} };
+    const st = { min: rep.min, max: rep.max };
+    for (const c of this.ex.checks || []) {
+      if (c.when === 'rep' && c.test(this.smooth, st)) this._flag(c.cue, events);
+    }
+    const dur = (t - rep.start) / 1000;
+    const minRep = this.ex.minRep == null ? 0.9 : this.ex.minRep;
+    if (minRep && dur < minRep) this._flag('Slow down — control every rep', events);
+    if (extra && extra.lockout) this._flag(this.ex.rep.lockout, events);
+    const r = { n: this.reps.length + 1, dur, faults: [...rep.faults] };
+    this.reps.push(r);
+    this.cur = null;
+    events.push({ type: 'rep', rep: r });
+  }
+
+  _checks(m, phase, events) {
+    this.activeFaults.clear();
+    for (const c of this.ex.checks || []) {
+      if (c.when === 'rep') continue;
+      const applies = c.when === 'any' || c.when === phase ||
+        (c.when === 'move' && (phase === 'move' || phase === 'target'));
+      let hit = false;
+      try { hit = applies && !!c.test(m, null); } catch (e) { hit = false; }
+      const n = hit ? (this.debounce.get(c) || 0) + 1 : 0;
+      this.debounce.set(c, n);
+      if (hit) this.activeFaults.add(c.cue);
+      if (n === 4) {
+        if (!this.cur && (c.when === 'any' || c.when === 'rest' || c.when === 'hold')) {
+          // Outside a rep: count once per occurrence.
+          this.tally.set(c.cue, (this.tally.get(c.cue) || 0) + 1);
+          events.push({ type: 'cue', text: c.cue });
+        } else this._flag(c.cue, events);
+      }
+    }
+  }
+
+  // m: raw metrics; t: ms timestamp. Returns events.
+  update(raw, t) {
+    const events = [];
+    const m = this._smoothed(raw);
+    const ex = this.ex;
+
+    if (ex.hold) {
+      const dt = this.hold.last == null ? 0 : Math.min(0.25, (t - this.hold.last) / 1000);
+      this.hold.last = t;
+      const valid = !!ex.hold.valid(m);
+      this.holding = valid;
+      if (valid) {
+        this.hold.total += dt;
+        this._checks(m, 'hold', events);
+        if (this.activeFaults.size === 0) this.hold.good += dt;
+      } else this.activeFaults.clear();
+      return events;
+    }
+
+    const r = ex.rep;
+    const v = m[r.m];
+    if (typeof v !== 'number' || !isFinite(v)) return events;
+
+    if (this.calib) {
+      this.calib.push(v);
+      if (this.calib.length >= 25) {
+        const s = [...this.calib].sort((a, b) => a - b);
+        this.restV = s[Math.floor(s.length / 2)];
+        this.targetV = this.restV + r.delta;
+        this.calib = null;
+        events.push({ type: 'ready' });
+      }
+      return events;
+    }
+
+    const p = (this.restV - v) / (this.restV - this.targetV);
+    this.p = p;
+    this._track(m);
+
+    switch (this.state) {
+      case 'idle':
+        if (p < 0.15) this.state = 'rest';
+        else if (p >= 0.9) { this.state = 'move'; this._beginRep(t); this.reached = true; this.trough = 1; }
+        break;
+      case 'rest':
+        if (p > 0.3) { this.state = 'move'; this._beginRep(t); this._track(m); this.reached = false; this.trough = 1; }
+        break;
+      case 'move':
+        if (p >= 1) this.reached = true;
+        if (this.reached) {
+          this.trough = Math.min(this.trough, p);
+          if (this.trough < 0.55 && p > this.trough + 0.3) {
+            // Went back down without finishing the rep: count it, flag lockout.
+            this._finishRep(t, events, { lockout: true });
+            this._beginRep(t); this._track(m);
+            this.reached = p >= 1; this.trough = 1;
+          }
+        }
+        if (p < 0.12) {
+          if (this.reached) this._finishRep(t, events);
+          else { this.partials++; this.cur = null; events.push({ type: 'partial', text: r.partial }); }
+          this.state = 'rest';
+        }
+        break;
+    }
+
+    const phase = this.state === 'move' ? (p >= 0.85 ? 'target' : 'move') : this.state === 'rest' ? 'rest' : 'idle';
+    this._checks(m, phase, events);
+    return events;
+  }
+
+  summary() {
+    const clean = this.reps.filter((r) => r.faults.length === 0).length;
+    const avg = this.reps.length ? this.reps.reduce((t, r) => t + r.dur, 0) / this.reps.length : 0;
+    const issues = [...this.tally.entries()].sort((a, b) => b[1] - a[1]);
+    return { reps: this.reps.length, clean, partials: this.partials, avg, issues, hold: this.ex.hold ? this.hold : null, list: this.reps };
+  }
+}
+// ===== end engine =====
+
+</script>
+<script type="module">
+// ===== Spotter app: picker, camera, pose loop, HUD, summary =====
+const CDN = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+const MODEL = {
+  lite: 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task',
+  full: 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task',
+};
+const CATS = ['All', 'Legs', 'Hinge', 'Push', 'Pull', 'Arms', 'Core'];
+const VIEW_LABEL = { side: 'Side view', front: 'Front view' };
+const BONES = [[11, 12], [11, 13], [13, 15], [12, 14], [14, 16], [11, 23], [12, 24], [23, 24], [23, 25], [25, 27],
+  [24, 26], [26, 28], [27, 29], [29, 31], [27, 31], [28, 30], [30, 32], [28, 32]];
+const COL = { base: '#4d8ef5', warn: '#f2c230', good: '#3cc77d' };
+
+const $ = (id) => document.getElementById(id);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('spotter.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('spotter.' + k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } },
+};
+const prefs = { voice: store.get('voice', true), facing: store.get('facing', 'environment'), accurate: store.get('accurate', false) };
+
+let cat = 'All', query = '';
+let ex = null, session = null, setNo = 0, lastExId = null;
+let landmarker = null, landmarkerAcc = null;
+let stream = null, running = false, raf = 0, mode = 'camera', lastVideoTime = -1, hiddenFrames = 0;
+let flashUntil = 0, wakeLock = null, failed = false, cueTimer = 0;
+const video = $('video'), canvas = $('canvas'), ctx = canvas.getContext('2d');
+
+// ---------- Picker ----------
+function renderChips() {
+  const nav = $('chips');
+  nav.textContent = '';
+  for (const c of CATS) {
+    const b = document.createElement('button');
+    b.className = 'chip'; b.textContent = c; b.setAttribute('aria-pressed', String(c === cat));
+    b.onclick = () => { cat = c; renderChips(); renderList(); };
+    nav.appendChild(b);
+  }
+}
+
+function renderList() {
+  const q = query.trim().toLowerCase();
+  const items = EXERCISES.filter((e) => (cat === 'All' || e.cat === cat) &&
+    (!q || (e.name + ' ' + e.cat + ' ' + e.focus).toLowerCase().includes(q)));
+  const g = $('groups');
+  g.textContent = '';
+  if (!items.length) { g.innerHTML = '<p class="empty">No exercises match that search.</p>'; return; }
+  for (const c of CATS.slice(1)) {
+    const list = items.filter((e) => e.cat === c);
+    if (!list.length) continue;
+    const sec = document.createElement('section'); sec.className = 'group';
+    const h = document.createElement('h2'); h.innerHTML = `<span>${c}</span><span class="num">${list.length}</span>`;
+    const ul = document.createElement('div'); ul.className = 'list';
+    for (const e of list) {
+      const b = document.createElement('button'); b.className = 'row';
+      const n = document.createElement('b'); n.textContent = e.name;
+      const v = document.createElement('span'); v.className = 'view'; v.textContent = VIEW_LABEL[e.view];
+      const s = document.createElement('small'); s.textContent = e.focus;
+      b.append(n, v, s);
+      b.onclick = () => openSheet(e);
+      ul.appendChild(b);
+    }
+    sec.append(h, ul); g.appendChild(sec);
+  }
+}
+
+function setupIcon(view) {
+  // Top-down: you (circle + shoulders), facing up; the phone sits in front or to the side.
+  const phone = view === 'front' ? '<rect x="23" y="3" width="10" height="15" rx="2"/>' : '<rect x="41" y="27" width="10" height="15" rx="2" transform="rotate(90 46 34.5)"/>';
+  return `<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <ellipse cx="22" cy="38" rx="12" ry="5"/><circle cx="22" cy="38" r="4.5" fill="currentColor"/>
+    <path d="M22 30v-6M19 27l3-3 3 3" opacity=".55"/>
+  </g><g fill="var(--accent)">${phone}</g>
+  <path d="${view === 'front' ? 'M28 20 L28 26' : 'M38 37 L33 37'}" stroke="var(--accent)" stroke-width="2" stroke-dasharray="2 2"/>`;
+}
+
+function openSheet(e) {
+  ex = e;
+  $('sh-name').textContent = e.name;
+  $('sh-view').textContent = VIEW_LABEL[e.view];
+  $('sh-cat').textContent = e.cat;
+  $('sh-setup').textContent = SETUP[e.setup || e.view];
+  $('sh-icon').innerHTML = setupIcon(e.view);
+  const ul = $('sh-checks'); ul.textContent = '';
+  const lines = e.focus.split('·').map((s) => s.trim());
+  const how = e.hold ? 'Times your hold while you’re in position' :
+    `Counts reps from your ${(METRIC_LABEL[e.rep.m] || 'joint').toLowerCase()} ${e.rep.rel ? 'movement' : 'angle'}`;
+  for (const t of [how, ...lines.map((s) => 'Checks ' + s.toLowerCase())]) {
+    const li = document.createElement('li'); li.textContent = t; ul.appendChild(li);
+  }
+  syncPrefsUI();
+  $('scrim').hidden = false; $('sheet').hidden = false;
+  $('go').focus();
+}
+function closeSheet() { $('scrim').hidden = true; $('sheet').hidden = true; }
+
+function syncPrefsUI() {
+  $('cam-back').setAttribute('aria-pressed', String(prefs.facing === 'environment'));
+  $('cam-front').setAttribute('aria-pressed', String(prefs.facing === 'user'));
+  $('opt-voice').checked = prefs.voice;
+  $('opt-accurate').checked = prefs.accurate;
+  $('l-voice').setAttribute('aria-pressed', String(prefs.voice));
+}
+
+// ---------- Model + camera ----------
+async function loadModel() {
+  const acc = prefs.accurate ? 'full' : 'lite';
+  if (landmarker && landmarkerAcc === acc) return landmarker;
+  const vision = await import(CDN + '/vision_bundle.mjs');
+  const fileset = await vision.FilesetResolver.forVisionTasks(CDN + '/wasm');
+  const opts = (delegate) => ({
+    baseOptions: { modelAssetPath: MODEL[acc], delegate }, runningMode: 'VIDEO', numPoses: 1,
+    minPoseDetectionConfidence: 0.5, minPosePresenceConfidence: 0.5, minTrackingConfidence: 0.5,
+  });
+  let lm;
+  try { lm = await vision.PoseLandmarker.createFromOptions(fileset, opts('GPU')); }
+  catch (e) { lm = await vision.PoseLandmarker.createFromOptions(fileset, opts('CPU')); }
+  if (landmarker) landmarker.close();
+  landmarker = lm; landmarkerAcc = acc;
+  return lm;
+}
+
+async function startCamera() {
+  if (!window.isSecureContext || !navigator.mediaDevices) {
+    const err = new Error('insecure'); err.code = 'insecure'; throw err;
+  }
+  stopStream();
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: prefs.facing, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false,
+  });
+  video.srcObject = stream;
+  video.removeAttribute('src');
+  $('live').classList.toggle('mirror', prefs.facing === 'user');
+  await video.play();
+}
+
+function stopStream() {
+  if (stream) { stream.getTracks().forEach((t) => t.stop()); stream = null; }
+}
+
+async function keepAwake() {
+  try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) { wakeLock = null; }
+}
+document.addEventListener('visibilitychange', () => { if (running && document.visibilityState === 'visible') keepAwake(); });
+
+// ---------- Live set ----------
+function showStatus(title, text) {
+  const s = $('status'); s.hidden = false;
+  s.innerHTML = '';
+  const b = document.createElement('b'); b.textContent = title;
+  const t = document.createElement('span'); t.textContent = text;
+  s.append(b, t);
+}
+function hideStatus() { $('status').hidden = true; }
+
+function resetHud() {
+  $('l-name').textContent = ex.name;
+  $('l-sub').textContent = `Set ${setNo} · ${VIEW_LABEL[ex.view]}`;
+  $('l-count').textContent = ex.hold ? '0:00' : '0';
+  $('l-lbl').textContent = ex.hold ? 'in position' : 'reps';
+  $('dots').textContent = '';
+  $('gauge').hidden = $('gauge-lbl').hidden = !!ex.hold;
+  $('gauge-lbl').firstChild.textContent = ex.rep ? (METRIC_LABEL[ex.rep.m] || 'Range') : '';
+  const cue = $('cue'); cue.classList.add('fade'); cue.textContent = '';
+  syncPrefsUI();
+}
+
+async function startSet(source, file) {
+  closeSheet();
+  if (ex.id !== lastExId) { setNo = 0; lastExId = ex.id; }
+  setNo++;
+  session = new Session(ex);
+  mode = source; failed = false; hiddenFrames = 0; lastVideoTime = -1;
+  document.body.style.overflow = 'hidden';
+  $('picker').hidden = true; $('summary').hidden = true; $('live').hidden = false;
+  resetHud();
+  $('l-flip').hidden = source !== 'camera';
+  $('l-end').textContent = source === 'camera' ? 'Finish set' : 'Stop';
+  showStatus('Loading', source === 'camera' ? 'Starting the camera and pose model…' : 'Loading the pose model…');
+  primeSpeech();
+  keepAwake();
+  try {
+    if (source === 'camera') {
+      await Promise.all([loadModel(), startCamera()]);
+    } else {
+      stopStream();
+      video.srcObject = null;
+      $('live').classList.remove('mirror');
+      video.src = URL.createObjectURL(file);
+      await loadModel();
+      video.currentTime = 0;
+      await video.play();
+    }
+  } catch (e) {
+    failed = true;
+    const name = e && (e.code || e.name);
+    if (name === 'insecure') showStatus('Needs https', 'Your browser only allows the camera on a secure (https) page. Host this file on GitHub Pages, Netlify or similar and open that link.');
+    else if (name === 'NotAllowedError') showStatus('Camera blocked', 'Allow camera access for this site in your browser settings, then try again.');
+    else if (name === 'NotFoundError' || name === 'OverconstrainedError') showStatus('No camera found', 'This device didn’t offer a camera. Try the other camera, or analyse a video instead.');
+    else if (source === 'file' && video.error) showStatus('Can’t play that video', 'Try an MP4 or MOV recorded on your phone.');
+    else showStatus('Couldn’t load the pose model', 'Check your internet connection and try again. The model downloads once (about 6–30 MB) and is then cached.');
+    $('l-end').textContent = 'Back';
+    return;
+  }
+  showStatus('Get in position', SETUP[ex.setup || ex.view]);
+  running = true;
+  loop();
+}
+
+function loop() {
+  if (!running) return;
+  if (video.readyState >= 2 && video.currentTime !== lastVideoTime) {
+    lastVideoTime = video.currentTime;
+    const now = performance.now();
+    let res = null;
+    try { res = landmarker.detectForVideo(video, now); } catch (e) { res = null; }
+    if (res) process(res, now);
+  }
+  if (mode === 'file' && video.ended) { finish(); return; }
+  raf = requestAnimationFrame(loop);
+}
+
+function process(res, now) {
+  const W = video.videoWidth, H = video.videoHeight;
+  if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
+  ctx.clearRect(0, 0, W, H);
+  const lms = res.landmarks && res.landmarks[0];
+  if (!lms) {
+    if (++hiddenFrames > 10) showStatus('Step into frame', SETUP[ex.setup || ex.view]);
+    return;
+  }
+  const P = lms.map((p) => ({ x: p.x * W, y: p.y * H, v: p.visibility == null ? 1 : p.visibility }));
+  const m = computeMetrics(P);
+  const visible = visibleEnough(P, ex, m.side);
+  const colour = now < flashUntil ? COL.good : session.activeFaults.size ? COL.warn : COL.base;
+  drawSkeleton(P, W, colour);
+  if (!visible) {
+    if (++hiddenFrames > 10) showStatus('Step back', `I need to see your ${NEED_LABEL[ex.need || 'all']} clearly.`);
+    return;
+  }
+  hiddenFrames = 0;
+  const events = session.update(m, now);
+  if (session.calibrating) showStatus('Hold still', 'Measuring your start position…');
+  else if (ex.hold && !session.holding) showStatus('Get in position', ex.hold.invalid);
+  else hideStatus();
+  for (const e of events) handleEvent(e);
+  updateHud(m);
+}
+
+function drawSkeleton(P, W, colour) {
+  const lw = Math.max(3, W / 170);
+  ctx.lineCap = 'round'; ctx.lineWidth = lw; ctx.strokeStyle = colour;
+  ctx.beginPath();
+  for (const [a, b] of BONES) {
+    if (P[a].v < 0.3 || P[b].v < 0.3) continue;
+    ctx.moveTo(P[a].x, P[a].y); ctx.lineTo(P[b].x, P[b].y);
+  }
+  ctx.stroke();
+  ctx.fillStyle = '#ffffff';
+  for (const i of [0, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28]) {
+    if (P[i].v < 0.5) continue;
+    ctx.beginPath(); ctx.arc(P[i].x, P[i].y, i === 0 ? lw * 1.6 : lw * 0.9, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+function fmtTime(s) { s = Math.floor(s); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
+
+function updateHud(m) {
+  if (ex.hold) {
+    $('l-count').textContent = fmtTime(session.hold.total);
+    $('l-lbl').textContent = `in position · ${fmtTime(session.hold.good)} clean`;
+    return;
+  }
+  $('l-count').textContent = String(session.reps.length);
+  $('l-lbl').textContent = session.partials ? `reps · ${session.partials} partial` : 'reps';
+  if (session.calibrating) return;
+  const p = Math.max(0, Math.min(1.15, session.p || 0));
+  $('gauge-fill').style.height = (p / 1.15) * 100 + '%';
+  $('gauge-tgt').style.bottom = (1 / 1.15) * 100 + '%';
+  $('gauge').classList.toggle('hit', p >= 1);
+  const v = m[ex.rep.m];
+  $('gauge-val').textContent = ex.rep.rel ? Math.round(p * 100) + '%' : (v == null ? '—' : Math.round(v) + '°');
+}
+
+function addDot(kind, title) {
+  const i = document.createElement('i');
+  if (kind) i.className = kind;
+  i.title = title || '';
+  $('dots').appendChild(i);
+}
+
+function handleEvent(e) {
+  if (e.type === 'cue') { showCue(e.text, 'warn'); speak(e.text); }
+  else if (e.type === 'partial') { addDot('p', 'Partial rep'); showCue(e.text, 'warn'); speak(e.text); }
+  else if (e.type === 'ready') { speak('Ready'); }
+  else if (e.type === 'rep') {
+    const clean = e.rep.faults.length === 0;
+    addDot(clean ? '' : 'f', e.rep.faults.join(', '));
+    if (clean) { flashUntil = performance.now() + 350; showCue(`Rep ${e.rep.n} — clean`, 'good'); speak(String(e.rep.n), 'count'); }
+  }
+}
+
+function showCue(text, kind) {
+  const c = $('cue');
+  c.textContent = text;
+  c.className = 'cue' + (kind === 'good' ? ' good' : '');
+  clearTimeout(cueTimer);
+  cueTimer = setTimeout(() => c.classList.add('fade'), kind === 'good' ? 1100 : 3200);
+}
+
+// ---------- Speech ----------
+let lastSpoken = 0;
+const spokenAt = new Map();
+function primeSpeech() {
+  // iOS only lets speech start from a tap, so speak a silent utterance now.
+  try { if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } } catch (e) { /* no speech */ }
+}
+function speak(text, kind) {
+  if (!prefs.voice || !('speechSynthesis' in window)) return;
+  const now = performance.now();
+  if (kind === 'count') { if (now - lastSpoken < 1200 || speechSynthesis.speaking) return; }
+  else {
+    if (now - (spokenAt.get(text) || -1e9) < 6000) return;
+    if (speechSynthesis.speaking) speechSynthesis.cancel();
+  }
+  const u = new SpeechSynthesisUtterance(text.replace(/\s—\s/g, ', '));
+  u.rate = 1.08;
+  speechSynthesis.speak(u);
+  lastSpoken = now; spokenAt.set(text, now);
+}
+
+// ---------- Finish + summary ----------
+function stopLive() {
+  running = false;
+  cancelAnimationFrame(raf);
+  stopStream();
+  video.pause();
+  if (video.src && video.src.startsWith('blob:')) { URL.revokeObjectURL(video.src); video.removeAttribute('src'); video.load(); }
+  try { speechSynthesis.cancel(); } catch (e) { /* no speech */ }
+  if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+  document.body.style.overflow = '';
+}
+
+function finish() {
+  stopLive();
+  $('live').hidden = true;
+  if (failed) { setNo--; $('picker').hidden = false; return; }
+  renderSummary(session.summary());
+  $('summary').hidden = false;
+  window.scrollTo(0, 0);
+}
+
+function stat(value, label, cls) {
+  const d = document.createElement('div'); if (cls) d.className = cls;
+  const b = document.createElement('b'); b.textContent = value;
+  const s = document.createElement('span'); s.textContent = label;
+  d.append(b, s); return d;
+}
+
+function renderSummary(s) {
+  $('s-set').textContent = `Set ${setNo}` + (mode === 'file' ? ' · from video' : '');
+  $('s-name').textContent = ex.name;
+  const st = $('s-stats'); st.textContent = '';
+  if (s.hold) {
+    st.append(stat(fmtTime(s.hold.total), 'in position'), stat(fmtTime(s.hold.good), 'clean form', 'clean'),
+      stat(String(s.issues.reduce((t, i) => t + i[1], 0)), 'form breaks'));
+  } else {
+    st.append(stat(String(s.reps), s.reps === 1 ? 'rep' : 'reps'), stat(String(s.clean), 'clean', 'clean'),
+      stat(s.partials ? String(s.partials) : (s.avg ? s.avg.toFixed(1) + 's' : '—'), s.partials ? 'partial' : 'avg rep'));
+  }
+
+  const iss = $('s-issues'); iss.textContent = '';
+  const h = document.createElement('h3'); h.textContent = 'What to work on'; iss.appendChild(h);
+  const nothing = s.hold ? s.hold.total < 1 : s.reps === 0 && s.partials === 0;
+  if (nothing) {
+    const p = document.createElement('div'); p.className = 'allgood';
+    p.textContent = s.hold ? 'Never saw you in position. ' + SETUP[ex.setup || ex.view]
+      : 'No reps were counted. ' + SETUP[ex.setup || ex.view] + ' Use full range so each rep reaches the target line.';
+    iss.appendChild(p);
+  } else if (!s.issues.length) {
+    const p = document.createElement('div'); p.className = 'allgood';
+    p.innerHTML = '<b>No form flags this set.</b> Keep the same setup and add weight or reps when it feels right.';
+    iss.appendChild(p);
+  } else {
+    const max = Math.max(1, s.reps, ...s.issues.map((i) => i[1]));
+    for (const [cue, n] of s.issues) {
+      const row = document.createElement('div'); row.className = 'issue';
+      const b = document.createElement('b'); b.textContent = cue;
+      const c = document.createElement('span'); c.className = 'num';
+      c.textContent = s.hold ? `${n}×` : `${n} of ${Math.max(s.reps, n)} reps`;
+      const bar = document.createElement('div'); bar.className = 'bar';
+      const fill = document.createElement('i'); fill.style.width = (n / max) * 100 + '%';
+      bar.appendChild(fill); row.append(b, c, bar); iss.appendChild(row);
+    }
+  }
+
+  const rl = $('s-replist'); rl.textContent = '';
+  if (!s.hold && s.list.length) {
+    const h3 = document.createElement('h3'); h3.textContent = 'Rep by rep';
+    const wrap = document.createElement('div'); wrap.className = 'reps';
+    for (const r of s.list) {
+      const sp = document.createElement('span'); sp.className = r.faults.length ? 'bad num' : 'ok num';
+      sp.textContent = `${r.n} · ${r.dur.toFixed(1)}s`;
+      sp.title = r.faults.length ? r.faults.join(', ') : 'Clean';
+      wrap.appendChild(sp);
+    }
+    rl.append(h3, wrap);
+  }
+}
+
+// ---------- Wiring ----------
+$('count').textContent = EXERCISES.length;
+$('q').addEventListener('input', (e) => { query = e.target.value; renderList(); });
+$('scrim').onclick = closeSheet;
+$('cancel').onclick = closeSheet;
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('sheet').hidden) closeSheet(); });
+$('cam-back').onclick = () => { prefs.facing = 'environment'; store.set('facing', prefs.facing); syncPrefsUI(); };
+$('cam-front').onclick = () => { prefs.facing = 'user'; store.set('facing', prefs.facing); syncPrefsUI(); };
+$('opt-voice').onchange = (e) => { prefs.voice = e.target.checked; store.set('voice', prefs.voice); syncPrefsUI(); };
+$('opt-accurate').onchange = (e) => { prefs.accurate = e.target.checked; store.set('accurate', prefs.accurate); };
+$('go').onclick = () => startSet('camera');
+$('vid-btn').onclick = () => $('vid-file').click();
+$('s-video').onclick = () => $('vid-file').click();
+$('vid-file').onchange = (e) => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (f && ex) startSet('file', f);
+};
+$('l-end').onclick = finish;
+$('l-voice').onclick = () => {
+  prefs.voice = !prefs.voice; store.set('voice', prefs.voice); syncPrefsUI();
+  if (!prefs.voice) try { speechSynthesis.cancel(); } catch (e) { /* no speech */ }
+};
+$('l-flip').onclick = async () => {
+  prefs.facing = prefs.facing === 'user' ? 'environment' : 'user'; store.set('facing', prefs.facing);
+  try { await startCamera(); lastVideoTime = -1; } catch (e) { showStatus('Can’t switch camera', 'That camera isn’t available on this device.'); }
+};
+$('s-again').onclick = () => startSet('camera');
+$('s-change').onclick = () => { $('summary').hidden = true; $('picker').hidden = false; };
+
+renderChips();
+renderList();
+// ===== end app =====
+
+</script>
+</body>
+</html>
